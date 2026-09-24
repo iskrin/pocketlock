@@ -1,6 +1,8 @@
 package pl.iskri.pocketlock
 
 import android.content.Context
+import android.media.AudioAttributes
+import android.media.SoundPool
 import android.os.Build
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
@@ -25,6 +27,9 @@ class LockOverlayView @JvmOverloads constructor(
     private var unlocked = false
     private var exitStarted = false
     private var exitFinished = false
+    private var soundPool: SoundPool? = null
+    private var pressSoundId = 0
+    private var soundLoaded = false
 
     var onUnlocked: (() -> Unit)? = null
 
@@ -44,6 +49,15 @@ class LockOverlayView @JvmOverloads constructor(
         super.onAttachedToWindow()
         requestFocus()
         hideSystemBars()
+        initSound()
+    }
+
+    override fun onDetachedFromWindow() {
+        soundPool?.release()
+        soundPool = null
+        pressSoundId = 0
+        soundLoaded = false
+        super.onDetachedFromWindow()
     }
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
@@ -136,10 +150,33 @@ class LockOverlayView @JvmOverloads constructor(
         if (presses < REQUIRED_PRESSES) presses++
         updateDots()
         performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        playPressSound()
         if (presses >= REQUIRED_PRESSES) {
             unlocked = true
             onUnlocked?.invoke()
         }
+    }
+
+    private fun initSound() {
+        if (soundPool != null) return
+        val attributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_GAME)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        val pool = SoundPool.Builder()
+            .setMaxStreams(2)
+            .setAudioAttributes(attributes)
+            .build()
+        pool.setOnLoadCompleteListener { _, _, status ->
+            soundLoaded = status == 0
+        }
+        pressSoundId = pool.load(context, R.raw.press_click, 1)
+        soundPool = pool
+    }
+
+    private fun playPressSound() {
+        if (!soundLoaded) return
+        soundPool?.play(pressSoundId, 1f, 1f, 1, 0, 1f)
     }
 
     private fun updateDots() {

@@ -56,6 +56,7 @@ przycisku lub 3 dotknięcia ekranu.
 - Z systemową blokadą („Przesuń”): pokazywana jest aktywność `showWhenLocked` + `turnScreenOn`
   z wyłączoną animacją wejścia (`FLAG_ACTIVITY_NO_ANIMATION`).
 - 3 kropki zapalają się po kolei; licznik się kumuluje (nie resetuje się).
+- Każde kliknięcie odtwarza krótki dźwięk (`app/src/main/res/raw/press_click.mp3`).
 - Po 3. kliknięciu ekran blokady dynamicznie zjeżdża w dół (350 ms, z przyspieszeniem),
   odkrywając grę/emulator dokładnie tam, gdzie została przerwana.
 - Przyciski Home/Back nie zdejmują blokady.
