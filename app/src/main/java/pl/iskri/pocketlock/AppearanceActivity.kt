@@ -144,6 +144,7 @@ class AppearanceActivity : Activity() {
         setTab(TAB_BACKGROUND)
 
         findViewById<Button>(R.id.btnChooseImage).setOnClickListener { pickImage() }
+        findViewById<Button>(R.id.btnDefaultImage).setOnClickListener { useDefaultImage() }
         findViewById<Button>(R.id.btnRemoveImage).setOnClickListener { removeImage() }
         findViewById<Button>(R.id.btnResetAppearance).setOnClickListener {
             Prefs.resetAppearance(this)
@@ -492,6 +493,17 @@ class AppearanceActivity : Activity() {
         } catch (_: Exception) {
             false
         }
+    }
+
+    private fun useDefaultImage() {
+        Prefs.setBackgroundEnabled(this, false)
+        Prefs.setBackgroundBlack(this, false)
+        try {
+            LockAppearance.backgroundFile(this).delete()
+        } catch (_: Exception) {
+        }
+        LockAppearance.invalidateCache()
+        refreshPreview()
     }
 
     private fun removeImage() {

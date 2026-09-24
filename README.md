@@ -56,10 +56,10 @@ Interfejs aplikacji jest w języku angielskim.
 Przycisk **Appearance…** w ustawieniach otwiera ekran z podglądem blokady 1:1 (stały u góry)
 i trzema zakładkami (podgląd jest cały czas widoczny podczas regulacji):
 
-- **Background** – Choose image / Remove image (zdjęcie kopiowane do aplikacji, zmniejszane do
-  rozdzielczości ekranu, z korektą obrotu EXIF), zoom i pozycja tła. Domyślnie (bez wybranego
-  zdjęcia) używane jest wbudowane tło (`res/drawable-nodpi/default_background.png`);
-  **Remove image** ustawia z powrotem czarne tło.
+- **Background** – trzy stany tła: **Choose image** (własne zdjęcie, kopiowane do aplikacji,
+  zmniejszane do rozdzielczości ekranu, z korektą obrotu EXIF), **Default image** (wbudowany
+  obrazek `res/drawable-nodpi/default_background.png`, używany też domyślnie) oraz
+  **Black background** (czarne tło). Do tego zoom i pozycja tła.
 - **Dots** – rozmiar, odstęp i pozycja kropek.
 - **Colors** – kolory kropek (aktywnej i nieaktywnej): barwa, nasycenie, jasność, krycie,
   oraz **Reset defaults**.
