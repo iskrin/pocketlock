@@ -20,8 +20,8 @@ android {
         applicationId = "pl.iskri.pocketlock"
         minSdk = 27
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.5"
+        versionCode = 7
+        versionName = "1.6"
     }
 
     signingConfigs {

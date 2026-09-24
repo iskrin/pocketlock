@@ -167,8 +167,9 @@ class LockOverlayView @JvmOverloads constructor(
             .setMaxStreams(2)
             .setAudioAttributes(attributes)
             .build()
-        pool.setOnLoadCompleteListener { _, _, status ->
+        pool.setOnLoadCompleteListener { _, sampleId, status ->
             soundLoaded = status == 0
+            Prefs.setSoundStatus(context, "status=$status sample=$sampleId")
         }
         pressSoundId = pool.load(context, R.raw.press_click, 1)
         soundPool = pool

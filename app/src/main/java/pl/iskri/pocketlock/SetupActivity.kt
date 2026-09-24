@@ -99,7 +99,8 @@ class SetupActivity : Activity() {
 
         findViewById<TextView>(R.id.tvDebug).text =
             "Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})\n" +
-            "Ostatnie wejście: " + Prefs.lastKey(this)
+            "Ostatnie wejście: " + Prefs.lastKey(this) + "\n" +
+            "Dźwięk: " + Prefs.soundStatus(this)
     }
 
     private fun yesNo(value: Boolean): String =
