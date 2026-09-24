@@ -146,6 +146,13 @@
             android:textSize="16sp"
             android:visibility="gone" />
 
+        <Button
+            android:id="@+id/btnAppearance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/btn_appearance" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

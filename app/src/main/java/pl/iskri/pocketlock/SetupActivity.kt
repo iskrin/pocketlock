@@ -66,6 +66,10 @@ class SetupActivity : Activity() {
             LockActivity.launch(this)
         }
 
+        findViewById<Button>(R.id.btnAppearance).setOnClickListener {
+            startActivity(Intent(this, AppearanceActivity::class.java))
+        }
+
         val cbSound = findViewById<CheckBox>(R.id.cbSound)
         cbSound.isChecked = Prefs.isSoundEnabled(this)
         cbSound.setOnCheckedChangeListener { _, checked -> Prefs.setSoundEnabled(this, checked) }

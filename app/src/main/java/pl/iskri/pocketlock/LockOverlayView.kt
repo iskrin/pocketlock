@@ -1,6 +1,7 @@
 package pl.iskri.pocketlock
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.os.Build
@@ -31,6 +32,7 @@ class LockOverlayView @JvmOverloads constructor(
     private var pressSoundId = 0
     private var soundLoaded = false
 
+    var interactive: Boolean = true
     var onUnlocked: (() -> Unit)? = null
 
     override fun onFinishInflate() {
@@ -42,11 +44,18 @@ class LockOverlayView @JvmOverloads constructor(
         )
         isFocusable = true
         isFocusableInTouchMode = true
+        LockAppearance.apply(this, context)
         updateDots()
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        LockAppearance.apply(this, context)
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        if (!interactive) return
         requestFocus()
         hideSystemBars()
         initSound()
@@ -62,10 +71,20 @@ class LockOverlayView @JvmOverloads constructor(
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
         super.onWindowFocusChanged(hasWindowFocus)
-        if (hasWindowFocus) {
+        if (interactive && hasWindowFocus) {
             requestFocus()
             hideSystemBars()
         }
+    }
+
+    fun applyAppearance() {
+        LockAppearance.apply(this, context)
+        updateDots()
+    }
+
+    fun setPreviewState(count: Int) {
+        presses = count.coerceIn(0, REQUIRED_PRESSES)
+        updateDots()
     }
 
     fun hideSystemBars() {
@@ -87,11 +106,13 @@ class LockOverlayView @JvmOverloads constructor(
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (!interactive) return super.dispatchKeyEvent(event)
         handleKeyEvent(event)
         return true
     }
 
     fun handleKeyEvent(event: KeyEvent) {
+        if (!interactive) return
         if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
             Prefs.setLastKey(context, "keyCode=${event.keyCode} (${KeyEvent.keyCodeToString(event.keyCode)})")
             registerPress()
@@ -99,6 +120,7 @@ class LockOverlayView @JvmOverloads constructor(
     }
 
     override fun onGenericMotionEvent(event: MotionEvent): Boolean {
+        if (!interactive) return super.onGenericMotionEvent(event)
         val value = maxOf(
             abs(event.getAxisValue(MotionEvent.AXIS_LTRIGGER)),
             abs(event.getAxisValue(MotionEvent.AXIS_RTRIGGER)),
@@ -118,6 +140,7 @@ class LockOverlayView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!interactive) return false
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
             Prefs.setLastKey(context, "screen touch")
             registerPress()
@@ -146,7 +169,7 @@ class LockOverlayView @JvmOverloads constructor(
     }
 
     private fun registerPress() {
-        if (unlocked) return
+        if (!interactive || unlocked) return
         if (presses < REQUIRED_PRESSES) presses++
         updateDots()
         if (Prefs.isVibrationEnabled(context)) {
@@ -185,12 +208,14 @@ class LockOverlayView @JvmOverloads constructor(
     }
 
     private fun updateDots() {
+        val activeColor = Prefs.dotActiveColor(context)
+        val inactiveColor = Prefs.dotInactiveColor(context)
         dots.forEachIndexed { index, dot ->
             val active = index < presses
+            dot.imageTintList = ColorStateList.valueOf(if (active) activeColor else inactiveColor)
             dot.animate()
-                .alpha(if (active) 1f else 0.15f)
-                .scaleX(if (active) 1f else 0.75f)
-                .scaleY(if (active) 1f else 0.75f)
+                .scaleX(if (active) 1f else 0.8f)
+                .scaleY(if (active) 1f else 0.8f)
                 .setDuration(120)
                 .start()
         }

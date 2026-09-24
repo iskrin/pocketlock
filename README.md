@@ -50,6 +50,20 @@ przycisku lub 3 dotknięcia ekranu. Interfejs aplikacji jest w języku angielski
 - Wskazówka: w Opcjach programisty można wyłączyć „Skala animacji okna / przejścia / animatora”,
   co dodatkowo wygładza przejścia w całym systemie.
 
+## Wygląd (Appearance)
+
+Przycisk **Appearance…** w ustawieniach otwiera ekran z podglądem blokady 1:1 i opcjami:
+
+- **Choose image** – własne zdjęcie tła (kopiowane do aplikacji, zmniejszane do rozdzielczości
+  ekranu, z automatyczną korektą obrotu EXIF); **Remove image** wraca do czarnego tła.
+- **Drag & pinch** na podglądzie + suwaki: zoom i pozycja tła, rozmiar/odstęp/pozycja kropek.
+- **Kolory kropek** – osobno dla stanu aktywnego i nieaktywnego (suwaki barwa/nasycenie/
+  jasność/krycie).
+- **Reset defaults** – przywraca domyślny wygląd kropek i ich pozycje (tło zostaje).
+
+Pozycje i przesunięcia zapisywane są jako ułamki rozmiaru ekranu, a kropki w dp × skala,
+więc ten sam wygląd działa poprawnie na 16:9, 4:3 i innych rozdzielczościach.
+
 ## Jak to działa
 
 - Usługa pierwszoplanowa nasłuchuje `ACTION_SCREEN_OFF` / `ACTION_SCREEN_ON`.

@@ -21,5 +21,31 @@
     <string name="yes">OK</string>
     <string name="no">missing</string>
 
+    <string name="btn_appearance">Appearance…</string>
+    <string name="appearance_title">Appearance</string>
+    <string name="appearance_choose_image">Choose image</string>
+    <string name="appearance_remove_image">Remove image</string>
+    <string name="appearance_reset">Reset defaults</string>
+    <string name="appearance_gesture_mode">Drag &amp; pinch on the preview adjusts:</string>
+    <string name="appearance_mode_background">Background</string>
+    <string name="appearance_mode_dots">Dots</string>
+    <string name="appearance_hint">One finger drags, two fingers pinch. Sliders give precise control.</string>
+    <string name="appearance_section_background">Background</string>
+    <string name="appearance_section_dots">Dots</string>
+    <string name="appearance_bg_zoom">Zoom</string>
+    <string name="appearance_bg_x">Position X</string>
+    <string name="appearance_bg_y">Position Y</string>
+    <string name="appearance_dot_size">Size</string>
+    <string name="appearance_dot_spacing">Spacing</string>
+    <string name="appearance_dot_x">Position X</string>
+    <string name="appearance_dot_y">Position Y</string>
+    <string name="appearance_color_active">Active dot color</string>
+    <string name="appearance_color_inactive">Inactive dot color</string>
+    <string name="appearance_hue">Hue</string>
+    <string name="appearance_saturation">Saturation</string>
+    <string name="appearance_brightness">Brightness</string>
+    <string name="appearance_alpha">Opacity</string>
+    <string name="appearance_import_failed">Could not load the selected image.</string>
+
     <string name="instructions">Console setup:\n\n1. Grant the \"Display over other apps\" permission — without it the lock screen will not appear on wake.\n2. Settings → Security → Screen lock → set \"None\" (recommended: the lock works as an overlay with no flash of the game) or \"Swipe\".\n3. Turn on the \"Lock enabled\" switch above.\n4. Disable battery optimization so the system does not kill the background service.\n\nUnlock: press any button or tap the screen 3 times.</string>
 </resources>

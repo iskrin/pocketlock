@@ -28,6 +28,10 @@
         </activity>
 
         <activity
+            android:name=".AppearanceActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".LockActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
             android:excludeFromRecents="true"
