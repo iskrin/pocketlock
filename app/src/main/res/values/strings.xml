@@ -23,6 +23,14 @@
     <string name="yes">OK</string>
     <string name="no">missing</string>
     <string name="instructions_title">Setup instructions</string>
+    <string name="status_device_admin">Device administrator (screen timeout)</string>
+    <string name="device_admin_explanation">Pocket Lock uses administrator rights to turn the screen off again when the lock screen is not unlocked in time.</string>
+    <string name="screen_timeout_label">Screen off after</string>
+    <string name="screen_timeout_hint">Turns the screen off when the lock screen is not unlocked in time. Requires the device administrator permission (Permissions tab).</string>
+    <string name="screen_timeout_admin_needed">Grant the device administrator permission (Permissions tab) to use the screen-off timeout.</string>
+    <string name="screen_timeout_never">Never</string>
+    <string name="screen_timeout_seconds">%1$d s</string>
+    <string name="screen_timeout_minutes">%1$d min</string>
 
     <string name="btn_appearance">Appearance…</string>
     <string name="appearance_title">Appearance</string>
@@ -49,5 +57,5 @@
     <string name="appearance_import_failed">Could not load the selected image.</string>
     <string name="appearance_processing">Processing image…</string>
 
-    <string name="instructions">Console setup:\n\n1. Grant the \"Display over other apps\" permission — without it the lock screen will not appear on wake.\n2. Settings → Security → Screen lock → set \"None\" (recommended: the lock works as an overlay with no flash of the game) or \"Swipe\".\n3. Turn on the \"Lock enabled\" switch above.\n4. Disable battery optimization so the system does not kill the background service.\n\nUnlock: press any button or tap the screen 3 times.</string>
+    <string name="instructions">Console setup:\n\n1. Grant the \"Display over other apps\" permission — without it the lock screen will not appear on wake.\n2. Settings → Security → Screen lock → set \"None\" (recommended: the lock works as an overlay with no flash of the game) or \"Swipe\".\n3. Turn on the \"Lock enabled\" switch above.\n4. Disable battery optimization so the system does not kill the background service.\n5. To have the screen turn off automatically when you do not unlock it, grant the "Device administrator" permission and choose a time in "Screen off after".\n\nUnlock: press any button or tap the screen 3 times.</string>
 </resources>

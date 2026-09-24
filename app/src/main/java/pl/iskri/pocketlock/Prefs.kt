@@ -11,6 +11,8 @@ object Prefs {
     private const val KEY_SOUND_ENABLED = "sound_enabled"
     private const val KEY_VIBRATION_ENABLED = "vibration_enabled"
     private const val KEY_NOTIFICATION_ENABLED = "notification_enabled"
+    private const val KEY_SCREEN_OFF_SECONDS = "screen_off_seconds"
+    private const val DEFAULT_SCREEN_OFF_SECONDS = 10
 
     private const val KEY_BG_ENABLED = "bg_enabled"
     private const val KEY_BG_SCALE = "bg_scale"
@@ -51,6 +53,13 @@ object Prefs {
 
     fun setNotificationEnabled(context: Context, enabled: Boolean) {
         sp(context).edit().putBoolean(KEY_NOTIFICATION_ENABLED, enabled).apply()
+    }
+
+    fun screenOffSeconds(context: Context): Int =
+        sp(context).getInt(KEY_SCREEN_OFF_SECONDS, DEFAULT_SCREEN_OFF_SECONDS)
+
+    fun setScreenOffSeconds(context: Context, seconds: Int) {
+        sp(context).edit().putInt(KEY_SCREEN_OFF_SECONDS, seconds).apply()
     }
 
     fun lastKey(context: Context): String =

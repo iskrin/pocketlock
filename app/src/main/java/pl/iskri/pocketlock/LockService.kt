@@ -82,6 +82,7 @@ class LockService : Service() {
         isRunning = false
         handler.removeCallbacks(armActivityRunnable)
         detachOverlay()
+        ScreenTimeout.cancel()
         abandonAudioFocus(this)
         LockActivity.finishIfRunning()
         screenReceiver?.let {
@@ -129,6 +130,7 @@ class LockService : Service() {
         // visible itself. The activity is launched with a short delay so it does not interfere
         // with the screen-off transition.
         lockArmed = true
+        ScreenTimeout.cancel()
         attachOverlay()
         requestAudioFocus(this)
         handler.removeCallbacks(armActivityRunnable)
@@ -146,6 +148,10 @@ class LockService : Service() {
         // No system keyguard: the overlay has been attached since SCREEN_OFF, so there is
         // nothing to do here. Attaching again would flash the lock screen if this broadcast
         // arrives late (e.g. right after the user already unlocked).
+        //
+        // The screen-off countdown starts here (and is reset on every press); the earlier cancel
+        // in armLock() makes sure a countdown never survives a screen-off.
+        ScreenTimeout.start(this)
     }
 
     private fun attachOverlay() {
@@ -153,10 +159,12 @@ class LockService : Service() {
         if (!Settings.canDrawOverlays(this)) return
         val view = LayoutInflater.from(this)
             .inflate(R.layout.activity_lock, null) as? LockOverlayView ?: return
+        view.onPress = { ScreenTimeout.start(this) }
         view.onUnlocked = {
             Log.i(TAG, "overlay unlocked")
             lockArmed = false
             handler.removeCallbacks(armActivityRunnable)
+            ScreenTimeout.cancel()
             abandonAudioFocus(this)
             LockActivity.finishIfRunning()
             view.playExitAnimation { detachOverlay() }
@@ -187,6 +195,7 @@ class LockService : Service() {
         lockArmed = false
         isOverlayAttached = false
         handler.removeCallbacks(armActivityRunnable)
+        ScreenTimeout.cancel()
         Log.i(TAG, "overlay detached")
         try {
             (getSystemService(Context.WINDOW_SERVICE) as WindowManager).removeView(view)

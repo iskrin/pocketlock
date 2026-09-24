@@ -37,6 +37,7 @@ class LockOverlayView @JvmOverloads constructor(
 
     var interactive: Boolean = true
     var onUnlocked: (() -> Unit)? = null
+    var onPress: (() -> Unit)? = null
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -199,6 +200,7 @@ class LockOverlayView @JvmOverloads constructor(
         if (!interactive || unlocked) return
         if (presses < REQUIRED_PRESSES) presses++
         updateDots()
+        onPress?.invoke()
         if (Prefs.isVibrationEnabled(context)) {
             performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         }

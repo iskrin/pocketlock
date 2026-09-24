@@ -3,6 +3,8 @@ package pl.iskri.pocketlock
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,18 +15,25 @@ import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
 import android.view.WindowInsets
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.Spinner
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import kotlin.math.roundToInt
 
 class SetupActivity : Activity() {
 
     private var tab = TAB_OPTIONS
+
+    // Values of the "Screen off after" spinner, in seconds; 0 means "never".
+    private val screenTimeoutValues = intArrayOf(5, 10, 15, 30, 60, 120, 0)
 
     private val enabledListener = CompoundButton.OnCheckedChangeListener { _, checked ->
         Prefs.setEnabled(this, checked)
@@ -73,6 +82,8 @@ class SetupActivity : Activity() {
             }
         }
 
+        findViewById<Button>(R.id.btnAdmin).setOnClickListener { requestAdmin() }
+
         findViewById<Switch>(R.id.swEnabled).setOnCheckedChangeListener(enabledListener)
 
         findViewById<Button>(R.id.btnAppearance).setOnClickListener {
@@ -95,6 +106,45 @@ class SetupActivity : Activity() {
             Prefs.setNotificationEnabled(this, checked)
             if (Prefs.isEnabled(this)) {
                 LockService.start(this)
+            }
+        }
+
+        val timeoutSpinner = findViewById<Spinner>(R.id.spScreenTimeout)
+        val timeoutLabels = screenTimeoutValues.map { seconds ->
+            when {
+                seconds <= 0 -> getString(R.string.screen_timeout_never)
+                seconds < 60 -> getString(R.string.screen_timeout_seconds, seconds)
+                else -> getString(R.string.screen_timeout_minutes, seconds / 60)
+            }
+        }
+        timeoutSpinner.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_item, timeoutLabels).apply {
+                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            }
+        val timeoutIndex = screenTimeoutValues.indexOf(Prefs.screenOffSeconds(this))
+        timeoutSpinner.setSelection(
+            if (timeoutIndex >= 0) timeoutIndex else screenTimeoutValues.lastIndex
+        )
+        timeoutSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val seconds = screenTimeoutValues[position]
+                if (Prefs.screenOffSeconds(this@SetupActivity) == seconds) return
+                Prefs.setScreenOffSeconds(this@SetupActivity, seconds)
+                if (seconds > 0 && !ScreenTimeout.isAdminActive(this@SetupActivity)) {
+                    Toast.makeText(
+                        this@SetupActivity,
+                        R.string.screen_timeout_admin_needed,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
 
@@ -136,6 +186,23 @@ class SetupActivity : Activity() {
             if (newTab == TAB_OPTIONS) 1f else 0.5f
     }
 
+    private fun requestAdmin() {
+        val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+            putExtra(
+                DevicePolicyManager.EXTRA_DEVICE_ADMIN,
+                ComponentName(this@SetupActivity, LockDeviceAdminReceiver::class.java)
+            )
+            putExtra(
+                DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                getString(R.string.device_admin_explanation)
+            )
+        }
+        try {
+            startActivity(intent)
+        } catch (_: Exception) {
+        }
+    }
+
     private fun showInstructions() {
         AlertDialog.Builder(this)
             .setTitle(R.string.instructions_title)
@@ -157,6 +224,10 @@ class SetupActivity : Activity() {
             getString(R.string.status_notifications) + ": " + yesNo(notifications)
         findViewById<TextView>(R.id.tvBatteryStatus).text =
             getString(R.string.status_battery) + ": " + yesNo(battery)
+
+        findViewById<TextView>(R.id.tvAdminStatus).text =
+            getString(R.string.status_device_admin) + ": " +
+            yesNo(ScreenTimeout.isAdminActive(this))
 
         findViewById<TextView>(R.id.tvServiceStatus).text =
             getString(R.string.status_service) + ": " +

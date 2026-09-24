@@ -35,6 +35,7 @@ class LockActivity : Activity() {
         setContentView(R.layout.activity_lock)
         lockView = findViewById(R.id.lock_root)
         lockView.onUnlocked = { unlock() }
+        lockView.onPress = { ScreenTimeout.start(this) }
         goImmersive()
     }
 
@@ -111,6 +112,7 @@ class LockActivity : Activity() {
 
     private fun unlock() {
         unlocking = true
+        ScreenTimeout.cancel()
         val km = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         if (km.isKeyguardLocked) {
             km.requestDismissKeyguard(this, object : KeyguardManager.KeyguardDismissCallback() {

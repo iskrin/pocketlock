@@ -13,6 +13,9 @@ work on any Android 8.0+ device.
 - **Lock on wake** — appears automatically every time the display turns on.
 - **Apps are paused while locked** — the lock screen is an opaque activity above the running app,
   so music or gameplay does not continue in the background.
+- **Screen-off timeout** — if you accidentally wake the device and don't unlock it, the screen
+  turns off again after the chosen time (5 s – 2 min, or *Never*). Requires the device
+  administrator permission.
 - **No flash** — with the system lock set to *None*, the lock screen is a pre-attached overlay,
   so the first frame after wake-up is the lock screen itself.
 - **Slide-down unlock animation.**
@@ -38,7 +41,9 @@ adb install -r PocketLock-1.0.apk
 2. **Permissions** tab: grant *Display over other apps* and disable battery optimization.
 3. Android Settings → Security → Screen lock → set **None** (recommended) or *Swipe*.
 4. **Options** tab: turn on **Lock enabled**.
-5. Full instructions are available under the **(i)** button in the app.
+5. Optional: grant **Device administrator** (Permissions tab, needed to turn the screen off again
+   when the lock screen is not unlocked) and pick a time in **Screen off after**.
+6. Full instructions are available under the **(i)** button in the app.
 
 ## Appearance
 
