@@ -36,10 +36,11 @@ class LockService : Service() {
                 Log.i(TAG, "broadcast: ${intent.action}")
                 if (!Prefs.isEnabled(context)) {
                     detachOverlay()
+                    LockActivity.finishIfRunning()
                     return
                 }
                 when (intent.action) {
-                    Intent.ACTION_SCREEN_OFF -> attachOverlay()
+                    Intent.ACTION_SCREEN_OFF -> armLock()
                     Intent.ACTION_SCREEN_ON -> onScreenOn()
                 }
             }
@@ -53,7 +54,7 @@ class LockService : Service() {
 
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
         if (!pm.isInteractive) {
-            attachOverlay()
+            armLock()
         }
     }
 
@@ -65,6 +66,7 @@ class LockService : Service() {
 
     override fun onDestroy() {
         detachOverlay()
+        LockActivity.finishIfRunning()
         screenReceiver?.let {
             try {
                 unregisterReceiver(it)
@@ -102,6 +104,16 @@ class LockService : Service() {
         }, 600L)
     }
 
+    private fun armLock() {
+        // The overlay provides the visuals (attached while the screen is off, so there is no
+        // flash on wake). The lock activity is launched as well: being an opaque activity above
+        // the running app, it makes the system stop that app - no music or gameplay continues
+        // behind the lock screen. The overlay window sits above the activity, so it is never
+        // visible itself.
+        attachOverlay()
+        LockActivity.launch(this)
+    }
+
     private fun onScreenOn() {
         val km = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         if (km.isKeyguardLocked) {
@@ -122,6 +134,7 @@ class LockService : Service() {
             .inflate(R.layout.activity_lock, null) as? LockOverlayView ?: return
         view.onUnlocked = {
             Log.i(TAG, "overlay unlocked")
+            LockActivity.finishIfRunning()
             view.playExitAnimation { detachOverlay() }
         }
         val params = WindowManager.LayoutParams(

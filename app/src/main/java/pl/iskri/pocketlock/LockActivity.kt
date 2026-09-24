@@ -14,18 +14,20 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
+import java.lang.ref.WeakReference
 
 class LockActivity : Activity() {
 
     private lateinit var lockView: LockOverlayView
     private var unlocking = false
     private var closing = false
+    private var silentFinish = false
     private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        instance = WeakReference(this)
         setShowWhenLocked(true)
-        setTurnScreenOn(true)
         @Suppress("DEPRECATION")
         window.setWindowAnimations(0)
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -34,6 +36,13 @@ class LockActivity : Activity() {
         lockView = findViewById(R.id.lock_root)
         lockView.onUnlocked = { unlock() }
         goImmersive()
+    }
+
+    override fun onDestroy() {
+        if (instance?.get() === this) {
+            instance = null
+        }
+        super.onDestroy()
     }
 
     override fun onResume() {
@@ -100,8 +109,10 @@ class LockActivity : Activity() {
     private fun exit() {
         if (closing) return
         closing = true
-        @Suppress("DEPRECATION")
-        overridePendingTransition(0, R.anim.lock_slide_down)
+        if (!silentFinish) {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, R.anim.lock_slide_down)
+        }
         finishAndRemoveTask()
     }
 
@@ -130,6 +141,8 @@ class LockActivity : Activity() {
     }
 
     companion object {
+        private var instance: WeakReference<LockActivity>? = null
+
         fun launch(context: Context) {
             val intent = Intent(context, LockActivity::class.java)
             intent.addFlags(
@@ -142,6 +155,16 @@ class LockActivity : Activity() {
             } catch (t: Throwable) {
                 Prefs.setLastKey(context, "start error: ${t.javaClass.simpleName}")
             }
+        }
+
+        fun finishIfRunning() {
+            val activity = instance?.get() ?: return
+            try {
+                activity.silentFinish = true
+                activity.finishAndRemoveTask()
+            } catch (_: Throwable) {
+            }
+            instance = null
         }
     }
 }

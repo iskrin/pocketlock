@@ -39,8 +39,7 @@
             android:launchMode="singleTask"
             android:showWhenLocked="true"
             android:taskAffinity="pl.iskri.pocketlock.lock"
-            android:theme="@style/LockTheme"
-            android:turnScreenOn="true" />
+            android:theme="@style/LockTheme" />
 
         <service
             android:name=".LockService"

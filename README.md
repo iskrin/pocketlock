@@ -11,6 +11,8 @@ work on any Android 8.0+ device.
 
 - **3-press unlock** — any button, trigger or screen tap counts; progress shown as three dots.
 - **Lock on wake** — appears automatically every time the display turns on.
+- **Apps are paused while locked** — the lock screen is an opaque activity above the running app,
+  so music or gameplay does not continue in the background.
 - **No flash** — with the system lock set to *None*, the lock screen is a pre-attached overlay,
   so the first frame after wake-up is the lock screen itself.
 - **Slide-down unlock animation.**
