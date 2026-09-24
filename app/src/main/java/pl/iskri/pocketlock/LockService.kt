@@ -174,6 +174,7 @@ class LockService : Service() {
         try {
             (getSystemService(Context.WINDOW_SERVICE) as WindowManager).addView(view, params)
             overlayView = view
+            isOverlayAttached = true
             Log.i(TAG, "overlay attached")
         } catch (t: Throwable) {
             Prefs.setLastKey(this, "overlay error: ${t.javaClass.simpleName}")
@@ -184,6 +185,7 @@ class LockService : Service() {
         val view = overlayView ?: return
         overlayView = null
         lockArmed = false
+        isOverlayAttached = false
         handler.removeCallbacks(armActivityRunnable)
         Log.i(TAG, "overlay detached")
         try {
@@ -224,9 +226,14 @@ class LockService : Service() {
         private const val CHANNEL_ID = "pocketlock"
         private const val NOTIFICATION_ID = 1
         private const val ARM_ACTIVITY_DELAY_MS = 200L
+        private const val ACTIVITY_DESTROY_TIMEOUT_MS = 700L
 
         @Volatile
         var isRunning = false
+            private set
+
+        @Volatile
+        var isOverlayAttached = false
             private set
 
         private var focusRequest: AudioFocusRequest? = null

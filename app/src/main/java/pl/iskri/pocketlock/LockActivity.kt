@@ -40,6 +40,9 @@ class LockActivity : Activity() {
 
     override fun onDestroy() {
         Log.i("PocketLock", "LockActivity destroyed")
+        val callback = destroyCallback
+        destroyCallback = null
+        callback?.invoke()
         if (instance?.get() === this) {
             instance = null
         }
@@ -58,6 +61,11 @@ class LockActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        // In the overlay mode the lock screen is drawn by the overlay window on top of this
+        // activity, so this activity shows a plain black window instead. That keeps the app
+        // below stopped (an opaque window) while making sure system snapshots / closing
+        // windows never contain a copy of the lock screen.
+        lockView.visibility = if (LockService.isOverlayAttached) View.INVISIBLE else View.VISIBLE
         goImmersive()
         lockView.requestFocus()
     }
@@ -73,6 +81,7 @@ class LockActivity : Activity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
+        lockView.visibility = if (LockService.isOverlayAttached) View.INVISIBLE else View.VISIBLE
         goImmersive()
     }
 
@@ -157,6 +166,7 @@ class LockActivity : Activity() {
 
     companion object {
         private var instance: WeakReference<LockActivity>? = null
+        private var destroyCallback: (() -> Unit)? = null
 
         fun launch(context: Context) {
             val intent = Intent(context, LockActivity::class.java)
@@ -172,8 +182,13 @@ class LockActivity : Activity() {
             }
         }
 
-        fun finishIfRunning() {
-            val activity = instance?.get() ?: return
+        fun finishIfRunning(onDestroyed: (() -> Unit)? = null) {
+            val activity = instance?.get()
+            if (activity == null) {
+                onDestroyed?.invoke()
+                return
+            }
+            destroyCallback = onDestroyed
             try {
                 activity.silentFinish = true
                 // Hide the activity window immediately: finishing is asynchronous, and its last
@@ -191,6 +206,8 @@ class LockActivity : Activity() {
                 activity.finishAndRemoveTask()
                 Log.i("PocketLock", "LockActivity finish requested")
             } catch (_: Throwable) {
+                destroyCallback = null
+                onDestroyed?.invoke()
             }
             instance = null
         }
