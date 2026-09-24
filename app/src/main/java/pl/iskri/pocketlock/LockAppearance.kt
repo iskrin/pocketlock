@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import java.io.File
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 object LockAppearance {
@@ -46,14 +47,19 @@ object LockAppearance {
         val background = root.findViewById<ImageView>(R.id.bg_image)
         val dots = root.findViewById<LinearLayout>(R.id.dots_container)
         if (background != null) {
-            applyBackground(background, context)
+            applyBackground(background, context, root.width, root.height)
         }
         if (dots != null) {
             applyDots(dots, context, root.width, root.height)
         }
     }
 
-    private fun applyBackground(background: ImageView, context: Context) {
+    private fun applyBackground(
+        background: ImageView,
+        context: Context,
+        rootW: Int,
+        rootH: Int
+    ) {
         val bitmap = loadBackground(context)
         if (bitmap == null) {
             background.visibility = View.GONE
@@ -65,10 +71,33 @@ object LockAppearance {
         val scale = Prefs.backgroundScale(context)
         background.scaleX = scale
         background.scaleY = scale
-        if (background.width > 0 && background.height > 0) {
-            background.translationX = Prefs.backgroundOffsetX(context) * background.width
-            background.translationY = Prefs.backgroundOffsetY(context) * background.height
+        if (rootW > 0 && rootH > 0) {
+            val range = backgroundPanRangePx(background, context, rootW, rootH)
+            background.translationX = Prefs.backgroundOffsetX(context) * range.first
+            background.translationY = Prefs.backgroundOffsetY(context) * range.second
         }
+    }
+
+    fun backgroundPanRangePx(root: View, context: Context): Pair<Float, Float> {
+        val background = root.findViewById<ImageView>(R.id.bg_image) ?: return 0f to 0f
+        return backgroundPanRangePx(background, context, root.width, root.height)
+    }
+
+    private fun backgroundPanRangePx(
+        background: ImageView,
+        context: Context,
+        rootW: Int,
+        rootH: Int
+    ): Pair<Float, Float> {
+        val drawable = background.drawable ?: return 0f to 0f
+        val imageW = drawable.intrinsicWidth.toFloat()
+        val imageH = drawable.intrinsicHeight.toFloat()
+        if (rootW <= 0 || rootH <= 0 || imageW <= 0f || imageH <= 0f) return 0f to 0f
+        val userScale = Prefs.backgroundScale(context)
+        val cover = max(rootW / imageW, rootH / imageH)
+        val drawnW = imageW * cover * userScale
+        val drawnH = imageH * cover * userScale
+        return max(0f, (drawnW - rootW) / 2f) to max(0f, (drawnH - rootH) / 2f)
     }
 
     private fun applyDots(dots: LinearLayout, context: Context, rootW: Int, rootH: Int) {

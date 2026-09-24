@@ -61,9 +61,9 @@ i trzema zakładkami (podgląd jest cały czas widoczny podczas regulacji):
   PNG na starszych, korekta obrotu EXIF), **Default image** (wbudowany obrazek
   `res/drawable-nodpi/default_background.png`, używany też domyślnie) oraz **Black background**
   (czarne tło). Do tego zoom i pozycja tła oraz przycisk **Reset** dla tych suwaków.
-  Tło przesuwa się swobodnie — przy zdjęciu o proporcjach innych niż ekran (np. 16:9 na 4:3)
-  zjedź zoomem poniżej 1, żeby zobaczyć całość; przy mocnym przesunięciu mogą pojawić się
-  czarne pasy (to normalne — widać wtedy tło bazowe).
+  Tło jest zawsze kadrowane tak, aby wypełniać ekran; suwakami X/Y przesuwasz kadr w zakresie
+  zdjęcia (np. 16:9 na 4:3 — lewo/prawo, bez czarnych pasów). Przy zoomie mniejszym niż
+  dopasowanie zdjęcie jest centrowane.
 - **Dots** – rozmiar, odstęp i pozycja kropek + przycisk **Reset** dla tych suwaków.
 - **Colors** – kolory kropek (aktywnej i nieaktywnej): barwa, nasycenie, jasność, krycie,
   oraz **Reset defaults**.

@@ -28,6 +28,8 @@ class AppearanceActivity : Activity() {
 
     private lateinit var preview: LockOverlayView
     private lateinit var previewContainer: FrameLayout
+    private lateinit var sbBgX: SliderBinding
+    private lateinit var sbBgY: SliderBinding
     private var previewScale = 1f
     private var screenW = 1
     private var screenH = 1
@@ -78,15 +80,20 @@ class AppearanceActivity : Activity() {
                 distanceY: Float
             ): Boolean {
                 if (scaleDetector.isInProgress || previewScale <= 0f) return true
-                val fx = -distanceX / previewScale / screenW
-                val fy = -distanceY / previewScale / screenH
                 if (tab == TAB_BACKGROUND) {
-                    Prefs.setBackgroundOffset(
-                        this@AppearanceActivity,
-                        (Prefs.backgroundOffsetX(this@AppearanceActivity) + fx).coerceIn(-0.5f, 0.5f),
-                        (Prefs.backgroundOffsetY(this@AppearanceActivity) + fy).coerceIn(-0.5f, 0.5f)
-                    )
+                    val range = LockAppearance.backgroundPanRangePx(preview, this@AppearanceActivity)
+                    var x = Prefs.backgroundOffsetX(this@AppearanceActivity)
+                    var y = Prefs.backgroundOffsetY(this@AppearanceActivity)
+                    if (range.first > 0f) {
+                        x = (x - distanceX / previewScale / range.first).coerceIn(-1f, 1f)
+                    }
+                    if (range.second > 0f) {
+                        y = (y - distanceY / previewScale / range.second).coerceIn(-1f, 1f)
+                    }
+                    Prefs.setBackgroundOffset(this@AppearanceActivity, x, y)
                 } else {
+                    val fx = -distanceX / previewScale / screenW
+                    val fy = -distanceY / previewScale / screenH
                     Prefs.setDotCenter(
                         this@AppearanceActivity,
                         (Prefs.dotCenterX(this@AppearanceActivity) + fx).coerceIn(0f, 1f),
@@ -228,6 +235,13 @@ class AppearanceActivity : Activity() {
     private fun refreshPreview() {
         LockAppearance.apply(preview, this)
         preview.setPreviewState(1)
+        val range = LockAppearance.backgroundPanRangePx(preview, this)
+        if (::sbBgX.isInitialized) {
+            sbBgX.seekBar.isEnabled = range.first > 0f
+        }
+        if (::sbBgY.isInitialized) {
+            sbBgY.seekBar.isEnabled = range.second > 0f
+        }
         syncSliders()
     }
 
@@ -240,12 +254,12 @@ class AppearanceActivity : Activity() {
             Prefs.setBackgroundScale(this, value)
             refreshPreview()
         }
-        addSlider(background, getString(R.string.appearance_bg_x), -0.5f, 0.5f,
+        sbBgX = addSlider(background, getString(R.string.appearance_bg_x), -1f, 1f,
             { Prefs.backgroundOffsetX(this) }) { value ->
             Prefs.setBackgroundOffset(this, value, Prefs.backgroundOffsetY(this))
             refreshPreview()
         }
-        addSlider(background, getString(R.string.appearance_bg_y), -0.5f, 0.5f,
+        sbBgY = addSlider(background, getString(R.string.appearance_bg_y), -1f, 1f,
             { Prefs.backgroundOffsetY(this) }) { value ->
             Prefs.setBackgroundOffset(this, Prefs.backgroundOffsetX(this), value)
             refreshPreview()
