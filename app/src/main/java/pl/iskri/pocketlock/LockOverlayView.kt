@@ -158,7 +158,10 @@ class LockOverlayView @JvmOverloads constructor(
             .translationY(distance)
             .setDuration(EXIT_DURATION_MS)
             .setInterpolator(AccelerateInterpolator(1.7f))
-            .withEndAction { finishExit(onEnd) }
+            .withEndAction {
+                alpha = 0f
+                finishExit(onEnd)
+            }
             .start()
     }
 
