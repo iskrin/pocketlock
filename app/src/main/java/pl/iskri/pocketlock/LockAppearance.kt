@@ -3,6 +3,8 @@ package pl.iskri.pocketlock
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.graphics.drawable.BitmapDrawable
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
@@ -67,15 +69,27 @@ object LockAppearance {
             return
         }
         background.visibility = View.VISIBLE
-        background.setImageBitmap(bitmap)
-        val scale = Prefs.backgroundScale(context)
-        background.scaleX = scale
-        background.scaleY = scale
-        if (rootW > 0 && rootH > 0) {
-            val range = backgroundPanRangePx(background, context, rootW, rootH)
-            background.translationX = Prefs.backgroundOffsetX(context) * range.first
-            background.translationY = Prefs.backgroundOffsetY(context) * range.second
+        val current = (background.drawable as? BitmapDrawable)?.bitmap
+        if (current !== bitmap) {
+            background.setImageBitmap(bitmap)
         }
+        if (rootW <= 0 || rootH <= 0) return
+        val bitmapW = bitmap.width.toFloat()
+        val bitmapH = bitmap.height.toFloat()
+        if (bitmapW <= 0f || bitmapH <= 0f) return
+        val cover = max(rootW / bitmapW, rootH / bitmapH)
+        val scale = cover * Prefs.backgroundScale(context)
+        val drawnW = bitmapW * scale
+        val drawnH = bitmapH * scale
+        val overflowX = max(0f, (drawnW - rootW) / 2f)
+        val overflowY = max(0f, (drawnH - rootH) / 2f)
+        val matrix = Matrix()
+        matrix.setScale(scale, scale)
+        matrix.postTranslate(
+            (rootW - drawnW) / 2f + Prefs.backgroundOffsetX(context) * overflowX,
+            (rootH - drawnH) / 2f + Prefs.backgroundOffsetY(context) * overflowY
+        )
+        background.imageMatrix = matrix
     }
 
     fun backgroundPanRangePx(root: View, context: Context): Pair<Float, Float> {
