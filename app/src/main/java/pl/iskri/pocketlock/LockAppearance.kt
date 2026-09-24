@@ -99,10 +99,10 @@ object LockAppearance {
     fun loadBackground(context: Context): Bitmap? {
         cachedBitmap?.let { if (!it.isRecycled) return it }
         val file = backgroundFile(context)
-        val bitmap = if (Prefs.isBackgroundEnabled(context) && file.exists()) {
-            decodeFile(context, file)
-        } else {
-            decodeDefault(context)
+        val bitmap = when {
+            Prefs.isBackgroundBlack(context) -> null
+            Prefs.isBackgroundEnabled(context) && file.exists() -> decodeFile(context, file)
+            else -> decodeDefault(context)
         }
         cachedBitmap = bitmap
         return bitmap

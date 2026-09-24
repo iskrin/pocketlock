@@ -403,6 +403,7 @@ class AppearanceActivity : Activity() {
                     return@runOnUiThread
                 }
                 Prefs.setBackgroundEnabled(this, true)
+                Prefs.setBackgroundBlack(this, false)
                 Prefs.setBackgroundScale(this, 1f)
                 Prefs.setBackgroundOffset(this, 0f, 0f)
                 LockAppearance.invalidateCache()
@@ -495,6 +496,7 @@ class AppearanceActivity : Activity() {
 
     private fun removeImage() {
         Prefs.setBackgroundEnabled(this, false)
+        Prefs.setBackgroundBlack(this, true)
         try {
             LockAppearance.backgroundFile(this).delete()
         } catch (_: Exception) {

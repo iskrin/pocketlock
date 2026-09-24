@@ -13,6 +13,7 @@ object Prefs {
     private const val KEY_NOTIFICATION_ENABLED = "notification_enabled"
 
     private const val KEY_BG_ENABLED = "bg_enabled"
+    private const val KEY_BG_BLACK = "bg_black"
     private const val KEY_BG_SCALE = "bg_scale"
     private const val KEY_BG_OFFSET_X = "bg_offset_x"
     private const val KEY_BG_OFFSET_Y = "bg_offset_y"
@@ -72,6 +73,13 @@ object Prefs {
 
     fun setBackgroundEnabled(context: Context, enabled: Boolean) {
         sp(context).edit().putBoolean(KEY_BG_ENABLED, enabled).apply()
+    }
+
+    fun isBackgroundBlack(context: Context): Boolean =
+        sp(context).getBoolean(KEY_BG_BLACK, false)
+
+    fun setBackgroundBlack(context: Context, black: Boolean) {
+        sp(context).edit().putBoolean(KEY_BG_BLACK, black).apply()
     }
 
     fun backgroundScale(context: Context): Float = sp(context).getFloat(KEY_BG_SCALE, 1f)
