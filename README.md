@@ -1,113 +1,71 @@
 # Pocket Lock
 
-Ekran blokady dla **Retroid Pocket Nova** (Android 13) w stylu Switcha: po wybudzeniu
-konsoli pojawia się czarny ekran z 3 dużymi kropkami na środku (opcjonalnie można ustawić
-własne zdjęcie tła). Odblokowanie = 3 naciśnięcia dowolnego przycisku lub 3 dotknięcia ekranu.
-Interfejs aplikacji jest w języku angielskim.
+A custom lock screen for Android handhelds, inspired by the Nintendo Switch lock screen.
+When the display wakes up, the lock screen shows three dots — unlock it by pressing any
+button (or tapping the screen) three times.
 
-## Pliki wynikowe
+Originally built for the **Retroid Pocket Nova** (Android 13, 4:3 screen), but it should
+work on any Android 8.0+ device.
 
-- `dist/PocketLock.apk` – gotowy do instalacji (release, podpisany)
-- `dist/PocketLock-debug.apk` – wersja debug (zapasowa)
+## Features
 
-## Instalacja
+- **3-press unlock** — any button, trigger or screen tap counts; progress shown as three dots.
+- **Lock on wake** — appears automatically every time the display turns on.
+- **No flash** — with the system lock set to *None*, the lock screen is a pre-attached overlay,
+  so the first frame after wake-up is the lock screen itself.
+- **Slide-down unlock animation.**
+- **Click sound & vibration** (can be turned off).
+- **Custom appearance** — your own background photo (stored losslessly as WebP/PNG, up to 4096 px),
+  pan/zoom, plus dot size, position and colors from a palette.
+- **Aspect-ratio independent** — positions are stored as fractions of the screen, so the same
+  settings adapt to any resolution (16:9, 4:3, ...).
+- **No ads, no analytics, no internet permission.**
 
-### Sposób 1: przez USB (adb)
+## Installation
 
-1. Na konsoli włącz opcje programisty: Ustawienia → Informacje → 7x klik w „Numer kompilacji”.
-2. W opcjach programisty włącz „Debugowanie USB”.
-3. Podłącz konsolę kablem USB i uruchom na PC:
-
-```
-%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe install -r dist\PocketLock.apk
-```
-
-### Sposób 2: bez kabla
-
-1. Skopiuj `PocketLock.apk` na konsolę (pendrive / karta microSD / chmura).
-2. Otwórz plik menedżerem plików i zezwól na instalację z nieznanych źródeł.
-
-## Konfiguracja konsoli (jednorazowo)
-
-1. Otwórz aplikację **Pocket Lock**.
-2. W zakładce **Permissions**: nadaj uprawnienie **Nakładki** („Display over other apps”)
-   i wyłącz **optymalizację baterii**.
-3. Ustawienia → Zabezpieczenia → **Blokada ekranu** → ustaw **„Brak”** (zalecane, patrz
-   „Tryby działania”) albo „Przesuń”.
-4. W zakładce **Options** włącz przełącznik **„Lock enabled”** (uruchomi usługę + autostart
-   po restarcie); tam też są **Click sound**, **Vibration** i przycisk **Appearance…**.
-
-Pełna instrukcja jest pod ikonką **(i)** w prawym górnym rogu ekranu aplikacji.
-
-## Tryby działania
-
-- **„Brak” + uprawnienie Nakładki = tryb nakładki (zalecany).** Czarna nakładka jest dodawana
-  już przy gaszeniu ekranu, więc po naciśnięciu power pierwsza klatka to od razu ekran blokady –
-  bez mignięcia gry i bez animacji „wjeżdżania”. Po 3 kliknięciach nakładka zjeżdża w dół
-  i gra jest od razu tam, gdzie ją zostawiłeś.
-- **„Przesuń” = tryb aktywności (zapasowy).** Systemowa blokada jest widoczna nad nakładką,
-  więc aplikacja pokazuje ekran blokady jako aktywność nad nią, z wyłączoną animacją wejścia.
-  Może wystąpić krótkie mignięcie obrazu.
-- Wskazówka: w Opcjach programisty można wyłączyć „Skala animacji okna / przejścia / animatora”,
-  co dodatkowo wygładza przejścia w całym systemie.
-
-## Wygląd (Appearance)
-
-Przycisk **Appearance…** w ustawieniach otwiera ekran z podglądem blokady 1:1 (stały u góry)
-i trzema zakładkami (podgląd jest cały czas widoczny podczas regulacji):
-
-- **Background** – **Choose image** (własne zdjęcie, kopiowane do aplikacji w oryginalnej
-  rozdzielczości — limit 4096 px, zapis bezstratny: WebP lossless na Androidzie 11+, PNG na
-  starszych, korekta obrotu EXIF) oraz **Black background** (czarne tło — stan domyślny).
-  Do tego zoom i pozycja tła oraz przycisk **Reset** dla tych suwaków.
-  Zdjęcie wypełnia ekran, a suwakami X/Y (albo przeciąganiem) przesuwasz kadr po całym zdjęciu —
-  odsłaniasz fragmenty, które nie mieściły się w kadrze (np. 16:9 na 4:3: lewo/prawo).
-  Oś bez ukrytego fragmentu (np. Y przy 16:9 na 4:3) ma nieaktywny suwak; po powiększeniu (zoom)
-  pojawia się zapas w obu osiach. Poniżej dopasowania zdjęcie jest centrowane.
-- **Dots** – rozmiar, odstęp i pozycja kropek + przycisk **Reset** dla tych suwaków
-  (domyślnie: duże kropki na środku ekranu).
-- **Colors** – paleta gotowych kolorów dla kropek (aktywnej i nieaktywnej) — klikasz próbkę,
-  podgląd blokady cały czas widoczny; do każdego koloru suwak **Opacity** (krycie) oraz
-  **Reset defaults**.
-
-Gesty na podglądzie (przeciąganie/pinch) działają na warstwę wybranej zakładki.
-
-Pozycje i przesunięcia zapisywane są jako ułamki rozmiaru ekranu, a kropki w dp × skala,
-więc ten sam wygląd działa poprawnie na 16:9, 4:3 i innych rozdzielczościach.
-
-## Jak to działa
-
-- Usługa pierwszoplanowa nasłuchuje `ACTION_SCREEN_OFF` / `ACTION_SCREEN_ON`.
-- Bez systemowej blokady: przy gaszeniu ekranu dodawana jest czarna nakładka
-  (`TYPE_APPLICATION_OVERLAY`) – jest gotowa, zanim wybudzisz ekran, więc nie ma mignięć.
-- Z systemową blokadą („Przesuń”): pokazywana jest aktywność `showWhenLocked` + `turnScreenOn`
-  z wyłączoną animacją wejścia (`FLAG_ACTIVITY_NO_ANIMATION`).
-- 3 kropki zapalają się po kolei; licznik się kumuluje (nie resetuje się).
-- Każde kliknięcie odtwarza dźwięk (`app/src/main/res/raw/press_click.ogg`) i wibruje;
-  jedno i drugie można wyłączyć w sekcji Options.
-- Po 3. kliknięciu ekran blokady dynamicznie zjeżdża w dół (350 ms, z przyspieszeniem),
-  odkrywając grę/emulator dokładnie tam, gdzie została przerwana.
-- Przyciski Home/Back nie zdejmują blokady.
-- Diagnostyka: w ekranie ustawień widać ostatnio odebrany klawisz (keycode), status dźwięku
-  i wersję Androida.
-
-## Budowanie ze źródeł
-
-Wymagania: JDK 17, Android SDK (platform 35, build-tools 35.0.0), Gradle 8.11.1.
+1. Download the latest `PocketLock-<version>.apk` from the [Releases](../../releases) page.
+2. Copy it to the device and install it (allow installation from unknown sources), or use adb:
 
 ```
-$env:JAVA_HOME="$env:LOCALAPPDATA\Android\jdk17"
-$env:ANDROID_HOME="$env:LOCALAPPDATA\Android\Sdk"
-$env:LOCALAPPDATA\Android\gradle-8.11.1\bin\gradle.bat assembleRelease
+adb install -r PocketLock-1.0.apk
 ```
 
-albo przez wrapper: `.\gradlew.bat assembleRelease`.
+## Setup
 
-## Uwagi
+1. Open **Pocket Lock**.
+2. **Permissions** tab: grant *Display over other apps* and disable battery optimization.
+3. Android Settings → Security → Screen lock → set **None** (recommended) or *Swipe*.
+4. **Options** tab: turn on **Lock enabled**.
+5. Full instructions are available under the **(i)** button in the app.
 
-- To zamek „konsolowy” (jak na Switchu), nie zabezpieczenie klasy bankowej – da się go
-  obejść przez ADB/recovery.
-- `keystore/` i `keystore.properties` nie są w repo (klucz podpisu). Bez nich zbuduje się
-  tylko wersja debug. Zachowaj je, jeśli chcesz aktualizować zainstalowaną aplikację.
-- Po pierwszym uruchomieniu system może chwilę pokazać własny ekran blokady zanim
-  pojawi się Pocket Lock (normalne przy starcie z tła).
+## Appearance
+
+Open **Appearance…** from the Options tab:
+
+- **Background** — choose your own photo or keep the black background; pan/zoom the image.
+- **Dots** — size, spacing and position of the three dots.
+- **Colors** — color palette + opacity for the active and inactive dot.
+
+## Building from source
+
+Requirements: JDK 17, Android SDK (platform 35, build-tools 35.0.0), Gradle 8.11.1.
+
+```
+./gradlew assembleRelease
+```
+
+For a signed release build, create `keystore.properties` in the project root:
+
+```
+storeFile=keystore/your.jks
+storePassword=...
+keyAlias=...
+keyPassword=...
+```
+
+## Disclaimer
+
+This is a personal hobby project. **The code, documentation and release process were created
+with the help of AI** (an AI coding assistant). The app is provided "as is", without any
+warranty — use it at your own risk. It is not a security-grade lock (it can be bypassed via
+ADB/recovery) and it is not affiliated with Retroid or Nintendo.
