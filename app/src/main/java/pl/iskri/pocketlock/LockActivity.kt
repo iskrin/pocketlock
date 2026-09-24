@@ -4,12 +4,16 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
 import android.view.KeyEvent
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
+import android.view.WindowManager
 
 class LockActivity : Activity() {
 
@@ -23,6 +27,8 @@ class LockActivity : Activity() {
         setTurnScreenOn(true)
         @Suppress("DEPRECATION")
         window.setWindowAnimations(0)
+        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        goImmersive()
         setContentView(R.layout.activity_lock)
         lockView = findViewById(R.id.lock_root)
         lockView.onUnlocked = { unlock() }
@@ -33,6 +39,14 @@ class LockActivity : Activity() {
         super.onResume()
         goImmersive()
         lockView.requestFocus()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            goImmersive()
+            lockView.requestFocus()
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -91,8 +105,15 @@ class LockActivity : Activity() {
         return pm.isInteractive
     }
 
-    @Suppress("DEPRECATION")
     private fun goImmersive() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false)
+            window.insetsController?.let {
+                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                it.hide(WindowInsets.Type.systemBars())
+            }
+        }
+        @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility = (
             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
