@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import java.io.File
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 object LockAppearance {
@@ -66,30 +65,9 @@ object LockAppearance {
         val scale = Prefs.backgroundScale(context)
         background.scaleX = scale
         background.scaleY = scale
-        clampBackgroundOffset(background, context)
         if (background.width > 0 && background.height > 0) {
             background.translationX = Prefs.backgroundOffsetX(context) * background.width
             background.translationY = Prefs.backgroundOffsetY(context) * background.height
-        }
-    }
-
-    fun clampBackgroundOffset(background: ImageView, context: Context) {
-        val drawable = background.drawable ?: return
-        val viewW = background.width.toFloat()
-        val viewH = background.height.toFloat()
-        val imageW = drawable.intrinsicWidth.toFloat()
-        val imageH = drawable.intrinsicHeight.toFloat()
-        if (viewW <= 0f || viewH <= 0f || imageW <= 0f || imageH <= 0f) return
-        val userScale = Prefs.backgroundScale(context)
-        val cover = max(viewW / imageW, viewH / imageH)
-        val drawnW = imageW * cover * userScale
-        val drawnH = imageH * cover * userScale
-        val maxX = max(0f, (drawnW - viewW) / 2f) / viewW
-        val maxY = max(0f, (drawnH - viewH) / 2f) / viewH
-        val x = Prefs.backgroundOffsetX(context).coerceIn(-maxX, maxX)
-        val y = Prefs.backgroundOffsetY(context).coerceIn(-maxY, maxY)
-        if (x != Prefs.backgroundOffsetX(context) || y != Prefs.backgroundOffsetY(context)) {
-            Prefs.setBackgroundOffset(context, x, y)
         }
     }
 
