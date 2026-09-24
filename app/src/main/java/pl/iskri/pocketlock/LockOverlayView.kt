@@ -1,5 +1,6 @@
 package pl.iskri.pocketlock
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.media.AudioAttributes
@@ -161,17 +162,29 @@ class LockOverlayView @JvmOverloads constructor(
     fun playExitAnimation(onEnd: () -> Unit) {
         if (exitStarted) return
         exitStarted = true
+        if (DISABLE_EXIT_ANIMATION) {
+            // TEST BUILD: no animation - the overlay disappears instantly.
+            alpha = 0f
+            finishExit(onEnd)
+            return
+        }
         val distance =
             if (height > 0) height.toFloat() else resources.displayMetrics.heightPixels.toFloat()
         postDelayed({ finishExit(onEnd) }, EXIT_DURATION_MS + 150L)
+        // Fade out during the last part of the slide, so that even if a final frame is drawn
+        // late (busy device) it is fully transparent.
+        ObjectAnimator.ofFloat(this, "alpha", 1f, 0f).apply {
+            startDelay = EXIT_DURATION_MS - FADE_DURATION_MS
+            duration = FADE_DURATION_MS
+        }.start()
         animate()
             .translationY(distance)
             .setDuration(EXIT_DURATION_MS)
             .setInterpolator(AccelerateInterpolator(1.7f))
             .withEndAction {
                 alpha = 0f
-                Log.i("PocketLock", "exit animation end")
-                finishExit(onEnd)
+                // Let the final (invisible) frame be drawn before the window is removed.
+                postOnAnimation { finishExit(onEnd) }
             }
             .start()
     }
@@ -238,5 +251,9 @@ class LockOverlayView @JvmOverloads constructor(
     companion object {
         const val REQUIRED_PRESSES = 3
         const val EXIT_DURATION_MS = 350L
+        private const val FADE_DURATION_MS = 120L
+
+        // TEST BUILD switch: when true, the unlock has no slide animation at all.
+        const val DISABLE_EXIT_ANIMATION = false
     }
 }
