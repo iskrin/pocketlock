@@ -19,6 +19,7 @@ class LockActivity : Activity() {
 
     private lateinit var lockView: LockOverlayView
     private var unlocking = false
+    private var closing = false
     private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,19 +85,23 @@ class LockActivity : Activity() {
         val km = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         if (km.isKeyguardLocked) {
             km.requestDismissKeyguard(this, object : KeyguardManager.KeyguardDismissCallback() {
-                override fun onDismissSucceeded() = close()
-                override fun onDismissError() = close()
-                override fun onDismissCancelled() = close()
+                override fun onDismissSucceeded() = exit()
+                override fun onDismissError() = exit()
+                override fun onDismissCancelled() = exit()
             })
             handler.postDelayed({
-                if (!isFinishing && !isDestroyed) close()
+                if (!isFinishing && !isDestroyed) exit()
             }, 1500)
         } else {
-            close()
+            exit()
         }
     }
 
-    private fun close() {
+    private fun exit() {
+        if (closing) return
+        closing = true
+        @Suppress("DEPRECATION")
+        overridePendingTransition(0, R.anim.lock_slide_down)
         finishAndRemoveTask()
     }
 

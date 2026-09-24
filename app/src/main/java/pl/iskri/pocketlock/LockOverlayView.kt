@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.view.animation.AccelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import kotlin.math.abs
@@ -22,6 +23,8 @@ class LockOverlayView @JvmOverloads constructor(
     private var presses = 0
     private var triggerLatched = false
     private var unlocked = false
+    private var exitStarted = false
+    private var exitFinished = false
 
     var onUnlocked: (() -> Unit)? = null
 
@@ -108,6 +111,26 @@ class LockOverlayView @JvmOverloads constructor(
         return true
     }
 
+    fun playExitAnimation(onEnd: () -> Unit) {
+        if (exitStarted) return
+        exitStarted = true
+        val distance =
+            if (height > 0) height.toFloat() else resources.displayMetrics.heightPixels.toFloat()
+        postDelayed({ finishExit(onEnd) }, EXIT_DURATION_MS + 150L)
+        animate()
+            .translationY(distance)
+            .setDuration(EXIT_DURATION_MS)
+            .setInterpolator(AccelerateInterpolator(1.7f))
+            .withEndAction { finishExit(onEnd) }
+            .start()
+    }
+
+    private fun finishExit(onEnd: () -> Unit) {
+        if (exitFinished) return
+        exitFinished = true
+        onEnd()
+    }
+
     private fun registerPress() {
         if (unlocked) return
         if (presses < REQUIRED_PRESSES) presses++
@@ -133,5 +156,6 @@ class LockOverlayView @JvmOverloads constructor(
 
     companion object {
         const val REQUIRED_PRESSES = 3
+        const val EXIT_DURATION_MS = 350L
     }
 }

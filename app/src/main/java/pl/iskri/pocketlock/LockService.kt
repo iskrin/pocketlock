@@ -88,14 +88,14 @@ class LockService : Service() {
         if (!Settings.canDrawOverlays(this)) return
         val view = LayoutInflater.from(this)
             .inflate(R.layout.activity_lock, null) as? LockOverlayView ?: return
-        view.onUnlocked = { detachOverlay() }
+        view.onUnlocked = { view.playExitAnimation { detachOverlay() } }
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                 or WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            PixelFormat.OPAQUE
+            PixelFormat.TRANSLUCENT
         )
         params.gravity = Gravity.TOP or Gravity.START
         params.setTitle("PocketLock")
