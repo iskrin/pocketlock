@@ -113,11 +113,9 @@ object LockAppearance {
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             BitmapFactory.decodeFile(file.absolutePath, bounds)
             if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
-            val metrics = context.resources.displayMetrics
-            val maxDim = max(metrics.widthPixels, metrics.heightPixels)
             var sample = 1
-            while (bounds.outWidth / (sample * 2) >= maxDim &&
-                bounds.outHeight / (sample * 2) >= maxDim) {
+            while (bounds.outWidth / sample > MAX_DIMENSION ||
+                bounds.outHeight / sample > MAX_DIMENSION) {
                 sample *= 2
             }
             val options = BitmapFactory.Options().apply {
@@ -147,4 +145,6 @@ object LockAppearance {
             value,
             context.resources.displayMetrics
         ).roundToInt()
+
+    private const val MAX_DIMENSION = 4096
 }

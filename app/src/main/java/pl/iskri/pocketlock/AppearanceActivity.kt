@@ -22,7 +22,6 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 class AppearanceActivity : Activity() {
@@ -393,6 +392,7 @@ class AppearanceActivity : Activity() {
     }
 
     private fun importImage(uri: Uri) {
+        Toast.makeText(this, R.string.appearance_processing, Toast.LENGTH_SHORT).show()
         Thread {
             val bitmap = prepareBitmap(uri)
             val saved = bitmap != null && saveBackground(bitmap)
@@ -419,14 +419,16 @@ class AppearanceActivity : Activity() {
             contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
             if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
 
-            val maxDim = max(screenW, screenH)
             var sample = 1
-            while (bounds.outWidth / (sample * 2) >= maxDim ||
-                bounds.outHeight / (sample * 2) >= maxDim) {
+            while (bounds.outWidth / sample > MAX_DIMENSION ||
+                bounds.outHeight / sample > MAX_DIMENSION) {
                 sample *= 2
             }
 
-            val options = BitmapFactory.Options().apply { inSampleSize = sample }
+            val options = BitmapFactory.Options().apply {
+                inSampleSize = sample
+                inPreferredConfig = Bitmap.Config.ARGB_8888
+            }
             var bitmap = contentResolver.openInputStream(uri)?.use {
                 BitmapFactory.decodeStream(it, null, options)
             } ?: return null
@@ -442,21 +444,6 @@ class AppearanceActivity : Activity() {
                 ExifInterface.ORIENTATION_NORMAL
             }
             bitmap = rotateBitmap(bitmap, orientation)
-
-            val longest = max(bitmap.width, bitmap.height)
-            if (longest > maxDim) {
-                val ratio = maxDim.toFloat() / longest
-                val scaled = Bitmap.createScaledBitmap(
-                    bitmap,
-                    (bitmap.width * ratio).roundToInt().coerceAtLeast(1),
-                    (bitmap.height * ratio).roundToInt().coerceAtLeast(1),
-                    true
-                )
-                if (scaled != bitmap) {
-                    bitmap.recycle()
-                }
-                bitmap = scaled
-            }
             bitmap
         } catch (_: Throwable) {
             null
@@ -487,7 +474,7 @@ class AppearanceActivity : Activity() {
     private fun saveBackground(bitmap: Bitmap): Boolean {
         return try {
             LockAppearance.backgroundFile(this).outputStream().use { out ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
             }
             true
         } catch (_: Exception) {
@@ -525,5 +512,6 @@ class AppearanceActivity : Activity() {
         const val TAB_DOTS = 1
         const val TAB_COLORS = 2
         const val SLIDER_STEPS = 1000f
+        const val MAX_DIMENSION = 4096
     }
 }
