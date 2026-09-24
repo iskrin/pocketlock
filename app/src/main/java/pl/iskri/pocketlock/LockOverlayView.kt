@@ -5,7 +5,9 @@ import android.content.res.ColorStateList
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.os.Build
+import android.os.PowerManager
 import android.util.AttributeSet
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -114,6 +116,7 @@ class LockOverlayView @JvmOverloads constructor(
     fun handleKeyEvent(event: KeyEvent) {
         if (!interactive) return
         if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+            if (!isScreenOn()) return
             Prefs.setLastKey(context, "keyCode=${event.keyCode} (${KeyEvent.keyCodeToString(event.keyCode)})")
             registerPress()
         }
@@ -121,6 +124,7 @@ class LockOverlayView @JvmOverloads constructor(
 
     override fun onGenericMotionEvent(event: MotionEvent): Boolean {
         if (!interactive) return super.onGenericMotionEvent(event)
+        if (!isScreenOn()) return true
         val value = maxOf(
             abs(event.getAxisValue(MotionEvent.AXIS_LTRIGGER)),
             abs(event.getAxisValue(MotionEvent.AXIS_RTRIGGER)),
@@ -142,10 +146,16 @@ class LockOverlayView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!interactive) return false
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+            if (!isScreenOn()) return true
             Prefs.setLastKey(context, "screen touch")
             registerPress()
         }
         return true
+    }
+
+    private fun isScreenOn(): Boolean {
+        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        return pm.isInteractive
     }
 
     fun playExitAnimation(onEnd: () -> Unit) {
@@ -160,6 +170,7 @@ class LockOverlayView @JvmOverloads constructor(
             .setInterpolator(AccelerateInterpolator(1.7f))
             .withEndAction {
                 alpha = 0f
+                Log.i("PocketLock", "exit animation end")
                 finishExit(onEnd)
             }
             .start()

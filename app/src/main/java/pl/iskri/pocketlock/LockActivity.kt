@@ -14,6 +14,7 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
+import android.util.Log
 import java.lang.ref.WeakReference
 
 class LockActivity : Activity() {
@@ -38,10 +39,21 @@ class LockActivity : Activity() {
     }
 
     override fun onDestroy() {
+        Log.i("PocketLock", "LockActivity destroyed")
         if (instance?.get() === this) {
             instance = null
         }
         super.onDestroy()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.i("PocketLock", "LockActivity paused")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.i("PocketLock", "LockActivity stopped")
     }
 
     override fun onResume() {
@@ -164,7 +176,20 @@ class LockActivity : Activity() {
             val activity = instance?.get() ?: return
             try {
                 activity.silentFinish = true
+                // Hide the activity window immediately: finishing is asynchronous, and its last
+                // frame (a copy of the lock screen) could otherwise flash when the overlay
+                // slides away and reveals the app underneath.
+                try {
+                    activity.lockView.visibility = View.INVISIBLE
+                } catch (_: Throwable) {
+                }
+                activity.window?.let { window ->
+                    val attributes = window.attributes
+                    attributes.alpha = 0f
+                    window.attributes = attributes
+                }
                 activity.finishAndRemoveTask()
+                Log.i("PocketLock", "LockActivity finish requested")
             } catch (_: Throwable) {
             }
             instance = null
