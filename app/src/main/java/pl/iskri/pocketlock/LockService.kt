@@ -16,6 +16,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.WindowManager
@@ -32,6 +33,7 @@ class LockService : Service() {
 
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
+                Log.i(TAG, "broadcast: ${intent.action}")
                 if (!Prefs.isEnabled(context)) {
                     detachOverlay()
                     return
@@ -107,11 +109,10 @@ class LockService : Service() {
             // so show the lock screen as an activity above the system keyguard.
             detachOverlay()
             LockActivity.launch(this)
-        } else {
-            // No system lock screen - the black overlay has been attached since SCREEN_OFF,
-            // so the first frame after wake-up is the lock screen itself.
-            attachOverlay()
         }
+        // No system keyguard: the overlay has been attached since SCREEN_OFF, so there is
+        // nothing to do here. Attaching again would flash the lock screen if this broadcast
+        // arrives late (e.g. right after the user already unlocked).
     }
 
     private fun attachOverlay() {
@@ -119,7 +120,10 @@ class LockService : Service() {
         if (!Settings.canDrawOverlays(this)) return
         val view = LayoutInflater.from(this)
             .inflate(R.layout.activity_lock, null) as? LockOverlayView ?: return
-        view.onUnlocked = { view.playExitAnimation { detachOverlay() } }
+        view.onUnlocked = {
+            Log.i(TAG, "overlay unlocked")
+            view.playExitAnimation { detachOverlay() }
+        }
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -133,6 +137,7 @@ class LockService : Service() {
         try {
             (getSystemService(Context.WINDOW_SERVICE) as WindowManager).addView(view, params)
             overlayView = view
+            Log.i(TAG, "overlay attached")
         } catch (t: Throwable) {
             Prefs.setLastKey(this, "overlay error: ${t.javaClass.simpleName}")
         }
@@ -141,6 +146,7 @@ class LockService : Service() {
     private fun detachOverlay() {
         val view = overlayView ?: return
         overlayView = null
+        Log.i(TAG, "overlay detached")
         try {
             (getSystemService(Context.WINDOW_SERVICE) as WindowManager).removeView(view)
         } catch (_: Exception) {
@@ -175,6 +181,7 @@ class LockService : Service() {
     }
 
     companion object {
+        private const val TAG = "PocketLock"
         private const val CHANNEL_ID = "pocketlock"
         private const val NOTIFICATION_ID = 1
 
