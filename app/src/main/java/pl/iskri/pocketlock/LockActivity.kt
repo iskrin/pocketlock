@@ -31,7 +31,6 @@ class LockActivity : Activity() {
         @Suppress("DEPRECATION")
         window.setWindowAnimations(0)
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        goImmersive()
         setContentView(R.layout.activity_lock)
         lockView = findViewById(R.id.lock_root)
         lockView.onUnlocked = { unlock() }
@@ -122,6 +121,9 @@ class LockActivity : Activity() {
     }
 
     private fun goImmersive() {
+        // Touch the decor view first: it may not exist yet (e.g. before setContentView),
+        // and window.insetsController requires it.
+        val decor = window.decorView
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
             window.insetsController?.let {
@@ -130,7 +132,7 @@ class LockActivity : Activity() {
             }
         }
         @Suppress("DEPRECATION")
-        window.decorView.systemUiVisibility = (
+        decor.systemUiVisibility = (
             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
