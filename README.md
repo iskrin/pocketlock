@@ -35,10 +35,8 @@ przycisku lub 3 dotknięcia ekranu. Interfejs aplikacji jest w języku angielski
 4. Włącz przełącznik **„Lock enabled”** (uruchomi usługę + autostart po restarcie).
 5. Wyłącz **optymalizację baterii** dla tej aplikacji.
 6. Kliknij **„Test the lock screen”** – powinien pojawić się czarny ekran z 3 kropkami.
-7. Opcjonalnie w sekcji **Options** wyłącz: **Click sound** (dźwięk), **Vibration**
-   (wibracje), **Show notification** (powiadomienie — jest od razu usuwane z paska,
-   a usługa dalej działa w tle; system i tak może pokazać aplikację w menedżerze
-   działających usług).
+7. Opcjonalnie w sekcji **Options** wyłącz: **Click sound** (dźwięk) lub **Vibration**
+   (wibracje).
 
 ## Tryby działania
 
