@@ -2,6 +2,7 @@ package pl.iskri.pocketlock
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,13 +11,20 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.view.View
+import android.view.WindowInsets
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
+import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.Switch
 import android.widget.TextView
+import kotlin.math.roundToInt
 
 class SetupActivity : Activity() {
+
+    private var tab = TAB_OPTIONS
 
     private val enabledListener = CompoundButton.OnCheckedChangeListener { _, checked ->
         Prefs.setEnabled(this, checked)
@@ -27,6 +35,11 @@ class SetupActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
+
+        findViewById<Button>(R.id.btnTabPermissions).setOnClickListener { setTab(TAB_PERMISSIONS) }
+        findViewById<Button>(R.id.btnTabOptions).setOnClickListener { setTab(TAB_OPTIONS) }
+
+        findViewById<ImageButton>(R.id.btnInfo).setOnClickListener { showInstructions() }
 
         findViewById<Button>(R.id.btnOverlay).setOnClickListener {
             try {
@@ -62,10 +75,6 @@ class SetupActivity : Activity() {
 
         findViewById<Switch>(R.id.swEnabled).setOnCheckedChangeListener(enabledListener)
 
-        findViewById<Button>(R.id.btnTest).setOnClickListener {
-            LockActivity.launch(this)
-        }
-
         findViewById<Button>(R.id.btnAppearance).setOnClickListener {
             startActivity(Intent(this, AppearanceActivity::class.java))
         }
@@ -92,11 +101,47 @@ class SetupActivity : Activity() {
         if (Prefs.isEnabled(this)) {
             LockService.start(this)
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val content = findViewById<FrameLayout>(R.id.setup_content)
+            content.setOnApplyWindowInsetsListener { view, insets ->
+                val gestureBottom = insets.getInsets(WindowInsets.Type.systemGestures()).bottom
+                view.setPadding(
+                    view.paddingLeft,
+                    view.paddingTop,
+                    view.paddingRight,
+                    dp(72) + gestureBottom
+                )
+                insets
+            }
+        }
+
+        setTab(if (Settings.canDrawOverlays(this)) TAB_OPTIONS else TAB_PERMISSIONS)
     }
 
     override fun onResume() {
         super.onResume()
         updateStatus()
+    }
+
+    private fun setTab(newTab: Int) {
+        tab = newTab
+        findViewById<View>(R.id.tab_permissions).visibility =
+            if (newTab == TAB_PERMISSIONS) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.tab_options).visibility =
+            if (newTab == TAB_OPTIONS) View.VISIBLE else View.GONE
+        findViewById<Button>(R.id.btnTabPermissions).alpha =
+            if (newTab == TAB_PERMISSIONS) 1f else 0.5f
+        findViewById<Button>(R.id.btnTabOptions).alpha =
+            if (newTab == TAB_OPTIONS) 1f else 0.5f
+    }
+
+    private fun showInstructions() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.instructions_title)
+            .setMessage(R.string.instructions)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     private fun updateStatus() {
@@ -120,13 +165,15 @@ class SetupActivity : Activity() {
             sw.isChecked = enabled
             sw.setOnCheckedChangeListener(enabledListener)
         }
-
-        findViewById<TextView>(R.id.tvDebug).text =
-            "Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})\n" +
-            "Last input: " + Prefs.lastKey(this) + "\n" +
-            "Sound: " + Prefs.soundStatus(this)
     }
 
     private fun yesNo(value: Boolean): String =
         if (value) getString(R.string.yes) else getString(R.string.no)
+
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).roundToInt()
+
+    private companion object {
+        const val TAB_PERMISSIONS = 0
+        const val TAB_OPTIONS = 1
+    }
 }

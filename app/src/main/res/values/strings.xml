@@ -8,18 +8,20 @@
     <string name="setup_title">Pocket Lock</string>
     <string name="setup_subtitle">Lock screen: 3 presses, just like on the Switch</string>
 
+    <string name="tab_permissions">Permissions</string>
+    <string name="tab_options">Options</string>
+
     <string name="status_overlay">\"Display over other apps\" permission (required)</string>
     <string name="status_notifications">Notifications</string>
     <string name="status_battery">Battery optimization disabled</string>
     <string name="btn_grant">Grant</string>
     <string name="switch_enabled">Lock enabled</string>
-    <string name="btn_test">Test the lock screen</string>
-    <string name="settings_title">Options</string>
     <string name="checkbox_sound">Click sound</string>
     <string name="checkbox_vibration">Vibration</string>
     <string name="checkbox_notification">Show notification</string>
     <string name="yes">OK</string>
     <string name="no">missing</string>
+    <string name="instructions_title">Setup instructions</string>
 
     <string name="btn_appearance">Appearance…</string>
     <string name="appearance_title">Appearance</string>

@@ -30,14 +30,14 @@ Interfejs aplikacji jest w języku angielskim.
 ## Konfiguracja konsoli (jednorazowo)
 
 1. Otwórz aplikację **Pocket Lock**.
-2. Nadaj uprawnienie **Nakładki** („Display over other apps”).
+2. W zakładce **Permissions**: nadaj uprawnienie **Nakładki** („Display over other apps”)
+   i wyłącz **optymalizację baterii**.
 3. Ustawienia → Zabezpieczenia → **Blokada ekranu** → ustaw **„Brak”** (zalecane, patrz
    „Tryby działania”) albo „Przesuń”.
-4. Włącz przełącznik **„Lock enabled”** (uruchomi usługę + autostart po restarcie).
-5. Wyłącz **optymalizację baterii** dla tej aplikacji.
-6. Kliknij **„Test the lock screen”** – powinien pojawić się czarny ekran z 3 kropkami.
-7. Opcjonalnie w sekcji **Options** wyłącz: **Click sound** (dźwięk) lub **Vibration**
-   (wibracje).
+4. W zakładce **Options** włącz przełącznik **„Lock enabled”** (uruchomi usługę + autostart
+   po restarcie); tam też są **Click sound**, **Vibration** i przycisk **Appearance…**.
+
+Pełna instrukcja jest pod ikonką **(i)** w prawym górnym rogu ekranu aplikacji.
 
 ## Tryby działania
 
