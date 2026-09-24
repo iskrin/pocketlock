@@ -143,4 +143,21 @@ object Prefs {
             .remove(KEY_DOT_INACTIVE_COLOR)
             .apply()
     }
+
+    fun resetBackgroundTransform(context: Context) {
+        sp(context).edit()
+            .remove(KEY_BG_SCALE)
+            .remove(KEY_BG_OFFSET_X)
+            .remove(KEY_BG_OFFSET_Y)
+            .apply()
+    }
+
+    fun resetDotTransform(context: Context) {
+        sp(context).edit()
+            .remove(KEY_DOT_SCALE)
+            .remove(KEY_DOT_SPACING)
+            .remove(KEY_DOT_CENTER_X)
+            .remove(KEY_DOT_CENTER_Y)
+            .apply()
+    }
 }

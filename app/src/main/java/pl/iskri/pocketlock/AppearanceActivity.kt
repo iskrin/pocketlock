@@ -145,6 +145,16 @@ class AppearanceActivity : Activity() {
         findViewById<Button>(R.id.btnChooseImage).setOnClickListener { pickImage() }
         findViewById<Button>(R.id.btnDefaultImage).setOnClickListener { useDefaultImage() }
         findViewById<Button>(R.id.btnRemoveImage).setOnClickListener { removeImage() }
+
+        findViewById<Button>(R.id.btnResetBackground).setOnClickListener {
+            Prefs.resetBackgroundTransform(this)
+            refreshPreview()
+        }
+
+        findViewById<Button>(R.id.btnResetDots).setOnClickListener {
+            Prefs.resetDotTransform(this)
+            refreshPreview()
+        }
         findViewById<Button>(R.id.btnResetAppearance).setOnClickListener {
             Prefs.resetAppearance(this)
             recreate()
@@ -473,8 +483,13 @@ class AppearanceActivity : Activity() {
 
     private fun saveBackground(bitmap: Bitmap): Boolean {
         return try {
+            val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                Bitmap.CompressFormat.WEBP_LOSSLESS
+            } else {
+                Bitmap.CompressFormat.PNG
+            }
             LockAppearance.backgroundFile(this).outputStream().use { out ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                bitmap.compress(format, 100, out)
             }
             true
         } catch (_: Exception) {
@@ -485,10 +500,7 @@ class AppearanceActivity : Activity() {
     private fun useDefaultImage() {
         Prefs.setBackgroundEnabled(this, false)
         Prefs.setBackgroundBlack(this, false)
-        try {
-            LockAppearance.backgroundFile(this).delete()
-        } catch (_: Exception) {
-        }
+        LockAppearance.deleteBackground(this)
         LockAppearance.invalidateCache()
         refreshPreview()
     }
@@ -496,10 +508,7 @@ class AppearanceActivity : Activity() {
     private fun removeImage() {
         Prefs.setBackgroundEnabled(this, false)
         Prefs.setBackgroundBlack(this, true)
-        try {
-            LockAppearance.backgroundFile(this).delete()
-        } catch (_: Exception) {
-        }
+        LockAppearance.deleteBackground(this)
         LockAppearance.invalidateCache()
         refreshPreview()
     }

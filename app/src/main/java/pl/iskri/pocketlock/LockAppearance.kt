@@ -13,11 +13,31 @@ import kotlin.math.roundToInt
 
 object LockAppearance {
 
-    const val BACKGROUND_FILE = "lock_bg.jpg"
+    const val BACKGROUND_FILE = "lock_bg.img"
+    private const val LEGACY_BACKGROUND_FILE = "lock_bg.jpg"
 
     private var cachedBitmap: Bitmap? = null
 
     fun backgroundFile(context: Context): File = File(context.filesDir, BACKGROUND_FILE)
+
+    private fun existingBackgroundFile(context: Context): File? {
+        val file = backgroundFile(context)
+        if (file.exists()) return file
+        val legacy = File(context.filesDir, LEGACY_BACKGROUND_FILE)
+        if (legacy.exists()) return legacy
+        return null
+    }
+
+    fun deleteBackground(context: Context) {
+        try {
+            backgroundFile(context).delete()
+        } catch (_: Exception) {
+        }
+        try {
+            File(context.filesDir, LEGACY_BACKGROUND_FILE).delete()
+        } catch (_: Exception) {
+        }
+    }
 
     fun invalidateCache() {
         cachedBitmap = null
@@ -98,10 +118,10 @@ object LockAppearance {
 
     fun loadBackground(context: Context): Bitmap? {
         cachedBitmap?.let { if (!it.isRecycled) return it }
-        val file = backgroundFile(context)
+        val file = if (Prefs.isBackgroundEnabled(context)) existingBackgroundFile(context) else null
         val bitmap = when {
             Prefs.isBackgroundBlack(context) -> null
-            Prefs.isBackgroundEnabled(context) && file.exists() -> decodeFile(context, file)
+            file != null -> decodeFile(context, file)
             else -> decodeDefault(context)
         }
         cachedBitmap = bitmap

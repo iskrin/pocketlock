@@ -29,6 +29,7 @@
     <string name="appearance_default_image">Default image</string>
     <string name="appearance_black_background">Black background</string>
     <string name="appearance_reset">Reset defaults</string>
+    <string name="appearance_reset_section">Reset</string>
     <string name="appearance_tab_background">Background</string>
     <string name="appearance_tab_dots">Dots</string>
     <string name="appearance_tab_colors">Colors</string>

@@ -57,10 +57,11 @@ Przycisk **Appearance…** w ustawieniach otwiera ekran z podglądem blokady 1:1
 i trzema zakładkami (podgląd jest cały czas widoczny podczas regulacji):
 
 - **Background** – trzy stany tła: **Choose image** (własne zdjęcie, kopiowane do aplikacji
-  w oryginalnej rozdzielczości — limit 4096 px, zapis JPEG q100, korekta obrotu EXIF),
-  **Default image** (wbudowany obrazek `res/drawable-nodpi/default_background.png`, używany też
-  domyślnie) oraz **Black background** (czarne tło). Do tego zoom i pozycja tła.
-- **Dots** – rozmiar, odstęp i pozycja kropek.
+  w oryginalnej rozdzielczości — limit 4096 px, zapis bezstratny: WebP lossless na Androidzie 11+,
+  PNG na starszych, korekta obrotu EXIF), **Default image** (wbudowany obrazek
+  `res/drawable-nodpi/default_background.png`, używany też domyślnie) oraz **Black background**
+  (czarne tło). Do tego zoom i pozycja tła oraz przycisk **Reset** dla tych suwaków.
+- **Dots** – rozmiar, odstęp i pozycja kropek + przycisk **Reset** dla tych suwaków.
 - **Colors** – kolory kropek (aktywnej i nieaktywnej): barwa, nasycenie, jasność, krycie,
   oraz **Reset defaults**.
 
