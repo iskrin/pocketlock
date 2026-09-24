@@ -17,5 +17,5 @@
     <string name="yes">OK</string>
     <string name="no">brak</string>
 
-    <string name="instructions">Konfiguracja konsoli:\n\n1. Nadaj uprawnienie „Nakładki” — bez niego blokada nie pojawi się sama po wybudzeniu ekranu.\n2. Ustawienia → Zabezpieczenia → Blokada ekranu → ustaw „Przesuń” (chroni przed przyciskiem Home) albo „Brak”.\n3. Włącz przełącznik „Blokada włączona” powyżej.\n4. Wyłącz optymalizację baterii, aby system nie zabijał usługi w tle.\n\nOdblokowanie: naciśnij dowolny przycisk lub dotknij ekranu 3 razy.</string>
+    <string name="instructions">Konfiguracja konsoli:\n\n1. Nadaj uprawnienie „Nakładki” — bez niego blokada nie pojawi się sama po wybudzeniu ekranu.\n2. Ustawienia → Zabezpieczenia → Blokada ekranu → ustaw „Brak” (zalecane: blokada działa jako nakładka, bez mignięcia obrazu gry) albo „Przesuń”.\n3. Włącz przełącznik „Blokada włączona” powyżej.\n4. Wyłącz optymalizację baterii, aby system nie zabijał usługi w tle.\n\nOdblokowanie: naciśnij dowolny przycisk lub dotknij ekranu 3 razy.</string>
 </resources>

@@ -8,34 +8,31 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
-import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
-import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
-import kotlin.math.abs
 
 class LockActivity : Activity() {
 
-    private lateinit var dots: List<ImageView>
-    private var presses = 0
+    private lateinit var lockView: LockOverlayView
     private var unlocking = false
-    private var triggerLatched = false
     private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setShowWhenLocked(true)
         setTurnScreenOn(true)
+        @Suppress("DEPRECATION")
+        window.setWindowAnimations(0)
         setContentView(R.layout.activity_lock)
-        dots = listOf(findViewById(R.id.dot1), findViewById(R.id.dot2), findViewById(R.id.dot3))
+        lockView = findViewById(R.id.lock_root)
+        lockView.onUnlocked = { unlock() }
         goImmersive()
-        updateDots()
     }
 
     override fun onResume() {
         super.onResume()
         goImmersive()
+        lockView.requestFocus()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -60,62 +57,13 @@ class LockActivity : Activity() {
         }
     }
 
+    // Zapasowa ścieżka, gdyby widok blokady nie dostał fokusu klawiatury.
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (event.repeatCount == 0) {
-            Prefs.setLastKey(this, "keyCode=$keyCode (${KeyEvent.keyCodeToString(keyCode)})")
-            registerPress()
-        }
+        lockView.handleKeyEvent(event)
         return true
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean = true
-
-    override fun onGenericMotionEvent(event: MotionEvent): Boolean {
-        val value = maxOf(
-            abs(event.getAxisValue(MotionEvent.AXIS_LTRIGGER)),
-            abs(event.getAxisValue(MotionEvent.AXIS_RTRIGGER)),
-            abs(event.getAxisValue(MotionEvent.AXIS_BRAKE)),
-            abs(event.getAxisValue(MotionEvent.AXIS_GAS))
-        )
-        if (value > 0.6f) {
-            if (!triggerLatched) {
-                triggerLatched = true
-                Prefs.setLastKey(this, "trigger (oś=${"%.2f".format(value)})")
-                registerPress()
-            }
-        } else if (value < 0.3f) {
-            triggerLatched = false
-        }
-        return true
-    }
-
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-            Prefs.setLastKey(this, "dotyk ekranu")
-            registerPress()
-        }
-        return true
-    }
-
-    private fun registerPress() {
-        if (unlocking) return
-        if (presses < REQUIRED_PRESSES) presses++
-        updateDots()
-        findViewById<View>(R.id.lock_root).performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-        if (presses >= REQUIRED_PRESSES) unlock()
-    }
-
-    private fun updateDots() {
-        dots.forEachIndexed { index, dot ->
-            val active = index < presses
-            dot.animate()
-                .alpha(if (active) 1f else 0.15f)
-                .scaleX(if (active) 1f else 0.75f)
-                .scaleY(if (active) 1f else 0.75f)
-                .setDuration(120)
-                .start()
-        }
-    }
 
     private fun unlock() {
         unlocking = true
@@ -156,11 +104,13 @@ class LockActivity : Activity() {
     }
 
     companion object {
-        const val REQUIRED_PRESSES = 3
-
         fun launch(context: Context) {
             val intent = Intent(context, LockActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            intent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK
+                    or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    or Intent.FLAG_ACTIVITY_NO_ANIMATION
+            )
             try {
                 context.startActivity(intent)
             } catch (t: Throwable) {
