@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.Switch
 import android.widget.TextView
@@ -65,6 +66,25 @@ class SetupActivity : Activity() {
             LockActivity.launch(this)
         }
 
+        val cbSound = findViewById<CheckBox>(R.id.cbSound)
+        cbSound.isChecked = Prefs.isSoundEnabled(this)
+        cbSound.setOnCheckedChangeListener { _, checked -> Prefs.setSoundEnabled(this, checked) }
+
+        val cbVibration = findViewById<CheckBox>(R.id.cbVibration)
+        cbVibration.isChecked = Prefs.isVibrationEnabled(this)
+        cbVibration.setOnCheckedChangeListener { _, checked ->
+            Prefs.setVibrationEnabled(this, checked)
+        }
+
+        val cbNotification = findViewById<CheckBox>(R.id.cbNotification)
+        cbNotification.isChecked = Prefs.isNotificationEnabled(this)
+        cbNotification.setOnCheckedChangeListener { _, checked ->
+            Prefs.setNotificationEnabled(this, checked)
+            if (Prefs.isEnabled(this)) {
+                LockService.start(this)
+            }
+        }
+
         if (Prefs.isEnabled(this)) {
             LockService.start(this)
         }
@@ -99,8 +119,8 @@ class SetupActivity : Activity() {
 
         findViewById<TextView>(R.id.tvDebug).text =
             "Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})\n" +
-            "Ostatnie wejście: " + Prefs.lastKey(this) + "\n" +
-            "Dźwięk: " + Prefs.soundStatus(this)
+            "Last input: " + Prefs.lastKey(this) + "\n" +
+            "Sound: " + Prefs.soundStatus(this)
     }
 
     private fun yesNo(value: Boolean): String =

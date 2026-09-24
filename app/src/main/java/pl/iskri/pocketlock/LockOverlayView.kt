@@ -108,7 +108,7 @@ class LockOverlayView @JvmOverloads constructor(
         if (value > 0.6f) {
             if (!triggerLatched) {
                 triggerLatched = true
-                Prefs.setLastKey(context, "trigger (oś=${"%.2f".format(value)})")
+                Prefs.setLastKey(context, "trigger (axis=${"%.2f".format(value)})")
                 registerPress()
             }
         } else if (value < 0.3f) {
@@ -119,7 +119,7 @@ class LockOverlayView @JvmOverloads constructor(
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-            Prefs.setLastKey(context, "dotyk ekranu")
+            Prefs.setLastKey(context, "screen touch")
             registerPress()
         }
         return true
@@ -149,8 +149,12 @@ class LockOverlayView @JvmOverloads constructor(
         if (unlocked) return
         if (presses < REQUIRED_PRESSES) presses++
         updateDots()
-        performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-        playPressSound()
+        if (Prefs.isVibrationEnabled(context)) {
+            performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        }
+        if (Prefs.isSoundEnabled(context)) {
+            playPressSound()
+        }
         if (presses >= REQUIRED_PRESSES) {
             unlocked = true
             onUnlocked?.invoke()

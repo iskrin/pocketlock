@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Pocket Lock</string>
-    <string name="notification_channel">Blokada ekranu</string>
-    <string name="notification_title">Pocket Lock aktywny</string>
-    <string name="notification_text">Blokada pokaże się po wybudzeniu ekranu.</string>
+    <string name="notification_channel">Screen lock</string>
+    <string name="notification_channel_hidden">Screen lock (hidden)</string>
+    <string name="notification_title">Pocket Lock is active</string>
+    <string name="notification_text">The lock screen appears when the display wakes up.</string>
 
     <string name="setup_title">Pocket Lock</string>
-    <string name="setup_subtitle">Ekran blokady: 3 kliknięcia, jak na Switchu</string>
+    <string name="setup_subtitle">Lock screen: 3 presses, just like on the Switch</string>
 
-    <string name="status_overlay">Uprawnienie „Nakładki” (wymagane)</string>
-    <string name="status_notifications">Powiadomienia</string>
-    <string name="status_battery">Ignorowanie optymalizacji baterii</string>
-    <string name="btn_grant">Nadaj</string>
-    <string name="switch_enabled">Blokada włączona</string>
-    <string name="btn_test">Przetestuj ekran blokady</string>
+    <string name="status_overlay">\"Display over other apps\" permission (required)</string>
+    <string name="status_notifications">Notifications</string>
+    <string name="status_battery">Battery optimization disabled</string>
+    <string name="btn_grant">Grant</string>
+    <string name="switch_enabled">Lock enabled</string>
+    <string name="btn_test">Test the lock screen</string>
+    <string name="settings_title">Options</string>
+    <string name="checkbox_sound">Click sound</string>
+    <string name="checkbox_vibration">Vibration</string>
+    <string name="checkbox_notification">Show notification</string>
     <string name="yes">OK</string>
-    <string name="no">brak</string>
+    <string name="no">missing</string>
 
-    <string name="instructions">Konfiguracja konsoli:\n\n1. Nadaj uprawnienie „Nakładki” — bez niego blokada nie pojawi się sama po wybudzeniu ekranu.\n2. Ustawienia → Zabezpieczenia → Blokada ekranu → ustaw „Brak” (zalecane: blokada działa jako nakładka, bez mignięcia obrazu gry) albo „Przesuń”.\n3. Włącz przełącznik „Blokada włączona” powyżej.\n4. Wyłącz optymalizację baterii, aby system nie zabijał usługi w tle.\n\nOdblokowanie: naciśnij dowolny przycisk lub dotknij ekranu 3 razy.</string>
+    <string name="instructions">Console setup:\n\n1. Grant the \"Display over other apps\" permission — without it the lock screen will not appear on wake.\n2. Settings → Security → Screen lock → set \"None\" (recommended: the lock works as an overlay with no flash of the game) or \"Swipe\".\n3. Turn on the \"Lock enabled\" switch above.\n4. Disable battery optimization so the system does not kill the background service.\n\nUnlock: press any button or tap the screen 3 times.</string>
 </resources>

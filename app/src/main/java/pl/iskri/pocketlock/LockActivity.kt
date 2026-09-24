@@ -58,7 +58,7 @@ class LockActivity : Activity() {
 
     @Suppress("OVERRIDE_DEPRECATION")
     override fun onBackPressed() {
-        // Przycisk Back nie może zdjąć blokady.
+        // The Back button must not dismiss the lock.
     }
 
     override fun onUserLeaveHint() {
@@ -72,7 +72,7 @@ class LockActivity : Activity() {
         }
     }
 
-    // Zapasowa ścieżka, gdyby widok blokady nie dostał fokusu klawiatury.
+    // Fallback path in case the lock view did not get keyboard focus.
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         lockView.handleKeyEvent(event)
         return true
@@ -140,7 +140,7 @@ class LockActivity : Activity() {
             try {
                 context.startActivity(intent)
             } catch (t: Throwable) {
-                Prefs.setLastKey(context, "błąd startu: ${t.javaClass.simpleName}")
+                Prefs.setLastKey(context, "start error: ${t.javaClass.simpleName}")
             }
         }
     }

@@ -25,7 +25,7 @@ class LockService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        createChannel()
+        createChannels()
         startForeground(NOTIFICATION_ID, buildNotification())
 
         val receiver = object : BroadcastReceiver() {
@@ -53,7 +53,11 @@ class LockService : Service() {
         }
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Refresh the notification (e.g. after the "Show notification" option changed).
+        startForeground(NOTIFICATION_ID, buildNotification())
+        return START_STICKY
+    }
 
     override fun onDestroy() {
         detachOverlay()
@@ -72,13 +76,13 @@ class LockService : Service() {
     private fun onScreenOn() {
         val km = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         if (km.isKeyguardLocked) {
-            // Systemowa blokada (np. „Przesuń”) jest widoczna, a nakładka znalazłaby się pod nią –
-            // pokazujemy więc ekran blokady jako aktywność nad systemową blokadą.
+            // A system lock screen (e.g. "Swipe") is showing and the overlay would sit below it,
+            // so show the lock screen as an activity above the system keyguard.
             detachOverlay()
             LockActivity.launch(this)
         } else {
-            // Brak systemowej blokady – czarna nakładka wisi nad ekranem już od SCREEN_OFF,
-            // więc pierwsza klatka po wybudzeniu to od razu ekran blokady.
+            // No system lock screen - the black overlay has been attached since SCREEN_OFF,
+            // so the first frame after wake-up is the lock screen itself.
             attachOverlay()
         }
     }
@@ -103,7 +107,7 @@ class LockService : Service() {
             (getSystemService(Context.WINDOW_SERVICE) as WindowManager).addView(view, params)
             overlayView = view
         } catch (t: Throwable) {
-            Prefs.setLastKey(this, "nakładka: błąd ${t.javaClass.simpleName}")
+            Prefs.setLastKey(this, "overlay error: ${t.javaClass.simpleName}")
         }
     }
 
@@ -116,25 +120,34 @@ class LockService : Service() {
         }
     }
 
-    private fun createChannel() {
+    private fun createChannels() {
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = NotificationChannel(
+        val visible = NotificationChannel(
             CHANNEL_ID,
             getString(R.string.notification_channel),
             NotificationManager.IMPORTANCE_MIN
         )
-        channel.setShowBadge(false)
-        nm.createNotificationChannel(channel)
+        visible.setShowBadge(false)
+        nm.createNotificationChannel(visible)
+
+        val hidden = NotificationChannel(
+            CHANNEL_ID_HIDDEN,
+            getString(R.string.notification_channel_hidden),
+            NotificationManager.IMPORTANCE_NONE
+        )
+        hidden.setShowBadge(false)
+        nm.createNotificationChannel(hidden)
     }
 
     private fun buildNotification(): Notification {
+        val channelId = if (Prefs.isNotificationEnabled(this)) CHANNEL_ID else CHANNEL_ID_HIDDEN
         val pi = PendingIntent.getActivity(
             this,
             0,
             Intent(this, SetupActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        return Notification.Builder(this, CHANNEL_ID)
+        return Notification.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_stat_lock)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(getString(R.string.notification_text))
@@ -145,6 +158,7 @@ class LockService : Service() {
 
     companion object {
         private const val CHANNEL_ID = "pocketlock"
+        private const val CHANNEL_ID_HIDDEN = "pocketlock_hidden"
         private const val NOTIFICATION_ID = 1
 
         fun start(context: Context) {

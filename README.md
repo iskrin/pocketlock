@@ -2,7 +2,7 @@
 
 Ekran blokady dla **Retroid Pocket Nova** (Android 13) w stylu Switcha: po wybudzeniu
 konsoli pojawia się czarny ekran z 3 kropkami. Odblokowanie = 3 naciśnięcia dowolnego
-przycisku lub 3 dotknięcia ekranu.
+przycisku lub 3 dotknięcia ekranu. Interfejs aplikacji jest w języku angielskim.
 
 ## Pliki wynikowe
 
@@ -29,19 +29,21 @@ przycisku lub 3 dotknięcia ekranu.
 ## Konfiguracja konsoli (jednorazowo)
 
 1. Otwórz aplikację **Pocket Lock**.
-2. Nadaj uprawnienie **Nakładki** („Nakładki i inne okna” / „Display over other apps”).
+2. Nadaj uprawnienie **Nakładki** („Display over other apps”).
 3. Ustawienia → Zabezpieczenia → **Blokada ekranu** → ustaw **„Brak”** (zalecane, patrz
    „Tryby działania”) albo „Przesuń”.
-4. Włącz przełącznik **„Blokada włączona”** (uruchomi usługę + autostart po restarcie).
+4. Włącz przełącznik **„Lock enabled”** (uruchomi usługę + autostart po restarcie).
 5. Wyłącz **optymalizację baterii** dla tej aplikacji.
-6. Kliknij **„Przetestuj ekran blokady”** – powinien pojawić się czarny ekran z 3 kropkami.
+6. Kliknij **„Test the lock screen”** – powinien pojawić się czarny ekran z 3 kropkami.
+7. Opcjonalnie w sekcji **Options** wyłącz: **Click sound** (dźwięk), **Vibration**
+   (wibracje), **Show notification** (powiadomienie w pasku).
 
 ## Tryby działania
 
 - **„Brak” + uprawnienie Nakładki = tryb nakładki (zalecany).** Czarna nakładka jest dodawana
   już przy gaszeniu ekranu, więc po naciśnięciu power pierwsza klatka to od razu ekran blokady –
-  bez mignięcia gry i bez animacji „wjeżdżania”. Po 3 kliknięciach nakładka znika i gra jest
-  od razu tam, gdzie ją zostawiłeś.
+  bez mignięcia gry i bez animacji „wjeżdżania”. Po 3 kliknięciach nakładka zjeżdża w dół
+  i gra jest od razu tam, gdzie ją zostawiłeś.
 - **„Przesuń” = tryb aktywności (zapasowy).** Systemowa blokada jest widoczna nad nakładką,
   więc aplikacja pokazuje ekran blokady jako aktywność nad nią, z wyłączoną animacją wejścia.
   Może wystąpić krótkie mignięcie obrazu.
@@ -56,11 +58,13 @@ przycisku lub 3 dotknięcia ekranu.
 - Z systemową blokadą („Przesuń”): pokazywana jest aktywność `showWhenLocked` + `turnScreenOn`
   z wyłączoną animacją wejścia (`FLAG_ACTIVITY_NO_ANIMATION`).
 - 3 kropki zapalają się po kolei; licznik się kumuluje (nie resetuje się).
-- Każde kliknięcie odtwarza krótki dźwięk (`app/src/main/res/raw/press_click.mp3`).
+- Każde kliknięcie odtwarza dźwięk (`app/src/main/res/raw/press_click.ogg`) i wibruje;
+  jedno i drugie można wyłączyć w sekcji Options.
 - Po 3. kliknięciu ekran blokady dynamicznie zjeżdża w dół (350 ms, z przyspieszeniem),
   odkrywając grę/emulator dokładnie tam, gdzie została przerwana.
 - Przyciski Home/Back nie zdejmują blokady.
-- Diagnostyka: w ekranie ustawień widać ostatnio odebrany klawisz (keycode) oraz wersję Androida.
+- Diagnostyka: w ekranie ustawień widać ostatnio odebrany klawisz (keycode), status dźwięku
+  i wersję Androida.
 
 ## Budowanie ze źródeł
 

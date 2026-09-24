@@ -112,6 +112,40 @@
             android:text="@string/btn_test" />
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/settings_title"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:id="@+id/cbSound"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/checkbox_sound"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <CheckBox
+            android:id="@+id/cbVibration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_vibration"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <CheckBox
+            android:id="@+id/cbNotification"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_notification"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
