@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pocket Lock</string>
+    <string name="notification_channel">Blokada ekranu</string>
+    <string name="notification_title">Pocket Lock aktywny</string>
+    <string name="notification_text">Blokada pokaże się po wybudzeniu ekranu.</string>
+
+    <string name="setup_title">Pocket Lock</string>
+    <string name="setup_subtitle">Ekran blokady: 3 kliknięcia, jak na Switchu</string>
+
+    <string name="status_overlay">Uprawnienie „Nakładki” (wymagane)</string>
+    <string name="status_notifications">Powiadomienia</string>
+    <string name="status_battery">Ignorowanie optymalizacji baterii</string>
+    <string name="btn_grant">Nadaj</string>
+    <string name="switch_enabled">Blokada włączona</string>
+    <string name="btn_test">Przetestuj ekran blokady</string>
+    <string name="yes">OK</string>
+    <string name="no">brak</string>
+
+    <string name="instructions">Konfiguracja konsoli:\n\n1. Nadaj uprawnienie „Nakładki” — bez niego blokada nie pojawi się sama po wybudzeniu ekranu.\n2. Ustawienia → Zabezpieczenia → Blokada ekranu → ustaw „Przesuń” (chroni przed przyciskiem Home) albo „Brak”.\n3. Włącz przełącznik „Blokada włączona” powyżej.\n4. Wyłącz optymalizację baterii, aby system nie zabijał usługi w tle.\n\nOdblokowanie: naciśnij dowolny przycisk lub dotknij ekranu 3 razy.</string>
+</resources>
