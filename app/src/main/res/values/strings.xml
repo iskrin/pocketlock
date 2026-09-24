@@ -26,7 +26,6 @@
     <string name="btn_appearance">Appearance…</string>
     <string name="appearance_title">Appearance</string>
     <string name="appearance_choose_image">Choose image</string>
-    <string name="appearance_default_image">Default image</string>
     <string name="appearance_black_background">Black background</string>
     <string name="appearance_reset">Reset defaults</string>
     <string name="appearance_reset_section">Reset</string>

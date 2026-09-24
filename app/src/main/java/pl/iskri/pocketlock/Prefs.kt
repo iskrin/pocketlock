@@ -13,7 +13,6 @@ object Prefs {
     private const val KEY_NOTIFICATION_ENABLED = "notification_enabled"
 
     private const val KEY_BG_ENABLED = "bg_enabled"
-    private const val KEY_BG_BLACK = "bg_black"
     private const val KEY_BG_SCALE = "bg_scale"
     private const val KEY_BG_OFFSET_X = "bg_offset_x"
     private const val KEY_BG_OFFSET_Y = "bg_offset_y"
@@ -75,13 +74,6 @@ object Prefs {
         sp(context).edit().putBoolean(KEY_BG_ENABLED, enabled).apply()
     }
 
-    fun isBackgroundBlack(context: Context): Boolean =
-        sp(context).getBoolean(KEY_BG_BLACK, false)
-
-    fun setBackgroundBlack(context: Context, black: Boolean) {
-        sp(context).edit().putBoolean(KEY_BG_BLACK, black).apply()
-    }
-
     fun backgroundScale(context: Context): Float = sp(context).getFloat(KEY_BG_SCALE, 1f)
 
     fun setBackgroundScale(context: Context, value: Float) {
@@ -96,7 +88,7 @@ object Prefs {
         sp(context).edit().putFloat(KEY_BG_OFFSET_X, x).putFloat(KEY_BG_OFFSET_Y, y).apply()
     }
 
-    fun dotScale(context: Context): Float = sp(context).getFloat(KEY_DOT_SCALE, 0.66f)
+    fun dotScale(context: Context): Float = sp(context).getFloat(KEY_DOT_SCALE, 1.2f)
 
     fun setDotScale(context: Context, value: Float) {
         sp(context).edit().putFloat(KEY_DOT_SCALE, value).apply()
@@ -110,7 +102,7 @@ object Prefs {
 
     fun dotCenterX(context: Context): Float = sp(context).getFloat(KEY_DOT_CENTER_X, 0.5f)
 
-    fun dotCenterY(context: Context): Float = sp(context).getFloat(KEY_DOT_CENTER_Y, 0.85f)
+    fun dotCenterY(context: Context): Float = sp(context).getFloat(KEY_DOT_CENTER_Y, 0.5f)
 
     fun setDotCenter(context: Context, x: Float, y: Float) {
         sp(context).edit().putFloat(KEY_DOT_CENTER_X, x).putFloat(KEY_DOT_CENTER_Y, y).apply()

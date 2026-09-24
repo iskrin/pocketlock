@@ -140,11 +140,7 @@ object LockAppearance {
     fun loadBackground(context: Context): Bitmap? {
         cachedBitmap?.let { if (!it.isRecycled) return it }
         val file = if (Prefs.isBackgroundEnabled(context)) existingBackgroundFile(context) else null
-        val bitmap = when {
-            Prefs.isBackgroundBlack(context) -> null
-            file != null -> decodeFile(context, file)
-            else -> decodeDefault(context)
-        }
+        val bitmap = if (file != null) decodeFile(context, file) else null
         cachedBitmap = bitmap
         return bitmap
     }
@@ -164,17 +160,6 @@ object LockAppearance {
                 inPreferredConfig = Bitmap.Config.ARGB_8888
             }
             BitmapFactory.decodeFile(file.absolutePath, options)
-        } catch (_: Throwable) {
-            null
-        }
-    }
-
-    private fun decodeDefault(context: Context): Bitmap? {
-        return try {
-            val options = BitmapFactory.Options().apply {
-                inPreferredConfig = Bitmap.Config.ARGB_8888
-            }
-            BitmapFactory.decodeResource(context.resources, R.drawable.default_background, options)
         } catch (_: Throwable) {
             null
         }

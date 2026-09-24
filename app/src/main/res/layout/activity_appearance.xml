@@ -80,13 +80,6 @@
                         android:text="@string/appearance_choose_image" />
 
                     <Button
-                        android:id="@+id/btnDefaultImage"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/appearance_default_image" />
-
-                    <Button
                         android:id="@+id/btnRemoveImage"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"

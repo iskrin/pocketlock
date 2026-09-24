@@ -1,8 +1,8 @@
 # Pocket Lock
 
 Ekran blokady dla **Retroid Pocket Nova** (Android 13) w stylu Switcha: po wybudzeniu
-konsoli pojawia się ekran z 3 kropkami na tle (domyślnie wbudowany obrazek, można ustawić
-własne zdjęcie). Odblokowanie = 3 naciśnięcia dowolnego przycisku lub 3 dotknięcia ekranu.
+konsoli pojawia się czarny ekran z 3 dużymi kropkami na środku (opcjonalnie można ustawić
+własne zdjęcie tła). Odblokowanie = 3 naciśnięcia dowolnego przycisku lub 3 dotknięcia ekranu.
 Interfejs aplikacji jest w języku angielskim.
 
 ## Pliki wynikowe
@@ -56,16 +56,16 @@ Pełna instrukcja jest pod ikonką **(i)** w prawym górnym rogu ekranu aplikacj
 Przycisk **Appearance…** w ustawieniach otwiera ekran z podglądem blokady 1:1 (stały u góry)
 i trzema zakładkami (podgląd jest cały czas widoczny podczas regulacji):
 
-- **Background** – trzy stany tła: **Choose image** (własne zdjęcie, kopiowane do aplikacji
-  w oryginalnej rozdzielczości — limit 4096 px, zapis bezstratny: WebP lossless na Androidzie 11+,
-  PNG na starszych, korekta obrotu EXIF), **Default image** (wbudowany obrazek
-  `res/drawable-nodpi/default_background.png`, używany też domyślnie) oraz **Black background**
-  (czarne tło). Do tego zoom i pozycja tła oraz przycisk **Reset** dla tych suwaków.
+- **Background** – **Choose image** (własne zdjęcie, kopiowane do aplikacji w oryginalnej
+  rozdzielczości — limit 4096 px, zapis bezstratny: WebP lossless na Androidzie 11+, PNG na
+  starszych, korekta obrotu EXIF) oraz **Black background** (czarne tło — stan domyślny).
+  Do tego zoom i pozycja tła oraz przycisk **Reset** dla tych suwaków.
   Zdjęcie wypełnia ekran, a suwakami X/Y (albo przeciąganiem) przesuwasz kadr po całym zdjęciu —
   odsłaniasz fragmenty, które nie mieściły się w kadrze (np. 16:9 na 4:3: lewo/prawo).
   Oś bez ukrytego fragmentu (np. Y przy 16:9 na 4:3) ma nieaktywny suwak; po powiększeniu (zoom)
   pojawia się zapas w obu osiach. Poniżej dopasowania zdjęcie jest centrowane.
-- **Dots** – rozmiar, odstęp i pozycja kropek + przycisk **Reset** dla tych suwaków.
+- **Dots** – rozmiar, odstęp i pozycja kropek + przycisk **Reset** dla tych suwaków
+  (domyślnie: duże kropki na środku ekranu).
 - **Colors** – paleta gotowych kolorów dla kropek (aktywnej i nieaktywnej) — klikasz próbkę,
   podgląd blokady cały czas widoczny; do każdego koloru suwak **Opacity** (krycie) oraz
   **Reset defaults**.
