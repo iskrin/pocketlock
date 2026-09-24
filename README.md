@@ -52,14 +52,16 @@ przycisku lub 3 dotknięcia ekranu. Interfejs aplikacji jest w języku angielski
 
 ## Wygląd (Appearance)
 
-Przycisk **Appearance…** w ustawieniach otwiera ekran z podglądem blokady 1:1 i opcjami:
+Przycisk **Appearance…** w ustawieniach otwiera ekran z podglądem blokady 1:1 (stały u góry)
+i trzema zakładkami (podgląd jest cały czas widoczny podczas regulacji):
 
-- **Choose image** – własne zdjęcie tła (kopiowane do aplikacji, zmniejszane do rozdzielczości
-  ekranu, z automatyczną korektą obrotu EXIF); **Remove image** wraca do czarnego tła.
-- **Drag & pinch** na podglądzie + suwaki: zoom i pozycja tła, rozmiar/odstęp/pozycja kropek.
-- **Kolory kropek** – osobno dla stanu aktywnego i nieaktywnego (suwaki barwa/nasycenie/
-  jasność/krycie).
-- **Reset defaults** – przywraca domyślny wygląd kropek i ich pozycje (tło zostaje).
+- **Background** – Choose image / Remove image (zdjęcie kopiowane do aplikacji, zmniejszane do
+  rozdzielczości ekranu, z korektą obrotu EXIF), zoom i pozycja tła.
+- **Dots** – rozmiar, odstęp i pozycja kropek.
+- **Colors** – kolory kropek (aktywnej i nieaktywnej): barwa, nasycenie, jasność, krycie,
+  oraz **Reset defaults**.
+
+Gesty na podglądzie (przeciąganie/pinch) działają na warstwę wybranej zakładki.
 
 Pozycje i przesunięcia zapisywane są jako ułamki rozmiaru ekranu, a kropki w dp × skala,
 więc ten sam wygląd działa poprawnie na 16:9, 4:3 i innych rozdzielczościach.

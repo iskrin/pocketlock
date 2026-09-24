@@ -31,7 +31,7 @@ class AppearanceActivity : Activity() {
     private var previewScale = 1f
     private var screenW = 1
     private var screenH = 1
-    private var mode = MODE_BACKGROUND
+    private var tab = TAB_BACKGROUND
     private var updating = false
 
     private class SliderBinding(
@@ -48,7 +48,7 @@ class AppearanceActivity : Activity() {
     private val scaleDetector by lazy {
         ScaleGestureDetector(this, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
             override fun onScale(detector: ScaleGestureDetector): Boolean {
-                if (mode == MODE_BACKGROUND) {
+                if (tab == TAB_BACKGROUND) {
                     Prefs.setBackgroundScale(
                         this@AppearanceActivity,
                         (Prefs.backgroundScale(this@AppearanceActivity) * detector.scaleFactor)
@@ -80,7 +80,7 @@ class AppearanceActivity : Activity() {
                 if (scaleDetector.isInProgress || previewScale <= 0f) return true
                 val fx = -distanceX / previewScale / screenW
                 val fy = -distanceY / previewScale / screenH
-                if (mode == MODE_BACKGROUND) {
+                if (tab == TAB_BACKGROUND) {
                     Prefs.setBackgroundOffset(
                         this@AppearanceActivity,
                         (Prefs.backgroundOffsetX(this@AppearanceActivity) + fx).coerceIn(-0.5f, 0.5f),
@@ -114,16 +114,20 @@ class AppearanceActivity : Activity() {
         preview.interactive = false
         preview.pivotX = 0f
         preview.pivotY = 0f
-        preview.setOnTouchListener { _, event ->
+        preview.setOnTouchListener { view, event ->
+            if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                view.parent?.requestDisallowInterceptTouchEvent(true)
+            }
             scaleDetector.onTouchEvent(event)
             gestureDetector.onTouchEvent(event)
             true
         }
         previewContainer.addView(preview, FrameLayout.LayoutParams(screenW, screenH))
 
-        findViewById<Button>(R.id.btnModeBackground).setOnClickListener { setMode(MODE_BACKGROUND) }
-        findViewById<Button>(R.id.btnModeDots).setOnClickListener { setMode(MODE_DOTS) }
-        setMode(MODE_BACKGROUND)
+        findViewById<Button>(R.id.btnTabBackground).setOnClickListener { setTab(TAB_BACKGROUND) }
+        findViewById<Button>(R.id.btnTabDots).setOnClickListener { setTab(TAB_DOTS) }
+        findViewById<Button>(R.id.btnTabColors).setOnClickListener { setTab(TAB_COLORS) }
+        setTab(TAB_BACKGROUND)
 
         findViewById<Button>(R.id.btnChooseImage).setOnClickListener { pickImage() }
         findViewById<Button>(R.id.btnRemoveImage).setOnClickListener { removeImage() }
@@ -154,18 +158,47 @@ class AppearanceActivity : Activity() {
         }
     }
 
+    private fun setTab(newTab: Int) {
+        tab = newTab
+        findViewById<View>(R.id.tab_background).visibility =
+            if (newTab == TAB_BACKGROUND) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.tab_dots).visibility =
+            if (newTab == TAB_DOTS) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.tab_colors).visibility =
+            if (newTab == TAB_COLORS) View.VISIBLE else View.GONE
+        findViewById<Button>(R.id.btnTabBackground).alpha =
+            if (newTab == TAB_BACKGROUND) 1f else 0.5f
+        findViewById<Button>(R.id.btnTabDots).alpha =
+            if (newTab == TAB_DOTS) 1f else 0.5f
+        findViewById<Button>(R.id.btnTabColors).alpha =
+            if (newTab == TAB_COLORS) 1f else 0.5f
+        findViewById<TextView>(R.id.tvHint).text = when (newTab) {
+            TAB_BACKGROUND -> getString(R.string.appearance_hint_background)
+            TAB_DOTS -> getString(R.string.appearance_hint_dots)
+            else -> getString(R.string.appearance_hint_colors)
+        }
+    }
+
     private fun layoutPreview() {
         val available = previewContainer.width
         if (available <= 0) return
-        previewScale = available.toFloat() / screenW
-        val previewHeight = (screenH * previewScale).roundToInt()
+        val maxHeight = (screenH * 0.45f).roundToInt()
+        var scale = available.toFloat() / screenW
+        if ((screenH * scale).roundToInt() > maxHeight) {
+            scale = maxHeight.toFloat() / screenH
+        }
+        previewScale = scale
+        val finalW = (screenW * scale).roundToInt()
+        val finalH = (screenH * scale).roundToInt()
         val params = previewContainer.layoutParams
-        if (params.height != previewHeight) {
-            params.height = previewHeight
+        if (params.height != finalH) {
+            params.height = finalH
             previewContainer.layoutParams = params
         }
-        preview.scaleX = previewScale
-        preview.scaleY = previewScale
+        preview.scaleX = scale
+        preview.scaleY = scale
+        preview.translationX = (available - finalW) / 2f
+        preview.translationY = 0f
     }
 
     private fun refreshPreview() {
@@ -173,14 +206,6 @@ class AppearanceActivity : Activity() {
         preview.setPreviewState(1)
         backgroundSliders.alpha = if (Prefs.isBackgroundEnabled(this)) 1f else 0.4f
         syncSliders()
-    }
-
-    private fun setMode(newMode: Int) {
-        mode = newMode
-        findViewById<Button>(R.id.btnModeBackground).alpha =
-            if (newMode == MODE_BACKGROUND) 1f else 0.45f
-        findViewById<Button>(R.id.btnModeDots).alpha =
-            if (newMode == MODE_DOTS) 1f else 0.45f
     }
 
     private fun buildSliders() {
@@ -468,8 +493,9 @@ class AppearanceActivity : Activity() {
 
     private companion object {
         const val PICK_IMAGE = 1
-        const val MODE_BACKGROUND = 0
-        const val MODE_DOTS = 1
+        const val TAB_BACKGROUND = 0
+        const val TAB_DOTS = 1
+        const val TAB_COLORS = 2
         const val SLIDER_STEPS = 1000f
     }
 }
