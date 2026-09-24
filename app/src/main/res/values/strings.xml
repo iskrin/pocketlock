@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">Pocket Lock</string>
     <string name="notification_channel">Screen lock</string>
-    <string name="notification_channel_hidden">Screen lock (hidden)</string>
     <string name="notification_title">Pocket Lock is active</string>
     <string name="notification_text">The lock screen appears when the display wakes up.</string>
 

@@ -36,7 +36,9 @@ przycisku lub 3 dotknięcia ekranu. Interfejs aplikacji jest w języku angielski
 5. Wyłącz **optymalizację baterii** dla tej aplikacji.
 6. Kliknij **„Test the lock screen”** – powinien pojawić się czarny ekran z 3 kropkami.
 7. Opcjonalnie w sekcji **Options** wyłącz: **Click sound** (dźwięk), **Vibration**
-   (wibracje), **Show notification** (powiadomienie w pasku).
+   (wibracje), **Show notification** (powiadomienie — jest od razu usuwane z paska,
+   a usługa dalej działa w tle; system i tak może pokazać aplikację w menedżerze
+   działających usług).
 
 ## Tryby działania
 

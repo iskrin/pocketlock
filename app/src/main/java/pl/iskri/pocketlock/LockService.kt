@@ -11,7 +11,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PixelFormat
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.Gravity
@@ -25,8 +27,8 @@ class LockService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        createChannels()
-        startForeground(NOTIFICATION_ID, buildNotification())
+        createChannel()
+        goForeground()
 
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -54,8 +56,8 @@ class LockService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Refresh the notification (e.g. after the "Show notification" option changed).
-        startForeground(NOTIFICATION_ID, buildNotification())
+        // Refresh the foreground notification (e.g. after the "Show notification" option changed).
+        goForeground()
         return START_STICKY
     }
 
@@ -72,6 +74,31 @@ class LockService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    private fun goForeground() {
+        startForeground(NOTIFICATION_ID, buildNotification())
+        if (!Prefs.isNotificationEnabled(this)) {
+            hideNotification()
+        }
+    }
+
+    private fun hideNotification() {
+        // Android requires a notification for a foreground service, but it does not have to
+        // stay visible: on Android 13 the user (and the app itself) can dismiss it while the
+        // service keeps running. Post it (done above) and remove it right away; cancel once
+        // more shortly after in case the system posts it asynchronously.
+        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        try {
+            nm.cancel(NOTIFICATION_ID)
+        } catch (_: Exception) {
+        }
+        Handler(Looper.getMainLooper()).postDelayed({
+            try {
+                nm.cancel(NOTIFICATION_ID)
+            } catch (_: Exception) {
+            }
+        }, 600L)
+    }
 
     private fun onScreenOn() {
         val km = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -120,34 +147,25 @@ class LockService : Service() {
         }
     }
 
-    private fun createChannels() {
+    private fun createChannel() {
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val visible = NotificationChannel(
+        val channel = NotificationChannel(
             CHANNEL_ID,
             getString(R.string.notification_channel),
             NotificationManager.IMPORTANCE_MIN
         )
-        visible.setShowBadge(false)
-        nm.createNotificationChannel(visible)
-
-        val hidden = NotificationChannel(
-            CHANNEL_ID_HIDDEN,
-            getString(R.string.notification_channel_hidden),
-            NotificationManager.IMPORTANCE_NONE
-        )
-        hidden.setShowBadge(false)
-        nm.createNotificationChannel(hidden)
+        channel.setShowBadge(false)
+        nm.createNotificationChannel(channel)
     }
 
     private fun buildNotification(): Notification {
-        val channelId = if (Prefs.isNotificationEnabled(this)) CHANNEL_ID else CHANNEL_ID_HIDDEN
         val pi = PendingIntent.getActivity(
             this,
             0,
             Intent(this, SetupActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        return Notification.Builder(this, channelId)
+        return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_lock)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(getString(R.string.notification_text))
@@ -158,7 +176,6 @@ class LockService : Service() {
 
     companion object {
         private const val CHANNEL_ID = "pocketlock"
-        private const val CHANNEL_ID_HIDDEN = "pocketlock_hidden"
         private const val NOTIFICATION_ID = 1
 
         fun start(context: Context) {
