@@ -108,6 +108,7 @@ class LockActivity : Activity() {
     private fun exit() {
         if (closing) return
         closing = true
+        LockService.abandonAudioFocus(this)
         if (!silentFinish) {
             @Suppress("DEPRECATION")
             overridePendingTransition(0, R.anim.lock_slide_down)

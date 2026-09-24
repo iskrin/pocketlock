@@ -11,6 +11,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PixelFormat
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
+import android.media.AudioManager
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -46,6 +49,7 @@ class LockService : Service() {
                 Log.i(TAG, "broadcast: ${intent.action}")
                 if (!Prefs.isEnabled(context)) {
                     detachOverlay()
+                    abandonAudioFocus(context)
                     LockActivity.finishIfRunning()
                     return
                 }
@@ -78,6 +82,7 @@ class LockService : Service() {
         isRunning = false
         handler.removeCallbacks(armActivityRunnable)
         detachOverlay()
+        abandonAudioFocus(this)
         LockActivity.finishIfRunning()
         screenReceiver?.let {
             try {
@@ -125,6 +130,7 @@ class LockService : Service() {
         // with the screen-off transition.
         lockArmed = true
         attachOverlay()
+        requestAudioFocus(this)
         handler.removeCallbacks(armActivityRunnable)
         handler.postDelayed(armActivityRunnable, ARM_ACTIVITY_DELAY_MS)
     }
@@ -151,6 +157,7 @@ class LockService : Service() {
             Log.i(TAG, "overlay unlocked")
             lockArmed = false
             handler.removeCallbacks(armActivityRunnable)
+            abandonAudioFocus(this)
             LockActivity.finishIfRunning()
             view.playExitAnimation { detachOverlay() }
         }
@@ -216,11 +223,42 @@ class LockService : Service() {
         private const val TAG = "PocketLock"
         private const val CHANNEL_ID = "pocketlock"
         private const val NOTIFICATION_ID = 1
-        private const val ARM_ACTIVITY_DELAY_MS = 1000L
+        private const val ARM_ACTIVITY_DELAY_MS = 200L
 
         @Volatile
         var isRunning = false
             private set
+
+        private var focusRequest: AudioFocusRequest? = null
+
+        fun requestAudioFocus(context: Context) {
+            if (focusRequest != null) return
+            try {
+                val attributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_GAME)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build()
+                val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                    .setAudioAttributes(attributes)
+                    .build()
+                val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                am.requestAudioFocus(request)
+                focusRequest = request
+                Log.i(TAG, "audio focus requested")
+            } catch (_: Throwable) {
+            }
+        }
+
+        fun abandonAudioFocus(context: Context) {
+            val request = focusRequest ?: return
+            focusRequest = null
+            try {
+                val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                am.abandonAudioFocusRequest(request)
+                Log.i(TAG, "audio focus abandoned")
+            } catch (_: Throwable) {
+            }
+        }
 
         fun start(context: Context) {
             try {
