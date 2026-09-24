@@ -25,9 +25,19 @@ class LockService : Service() {
 
     private var screenReceiver: BroadcastReceiver? = null
     private var overlayView: LockOverlayView? = null
+    private var lockArmed = false
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val armActivityRunnable = Runnable {
+        if (lockArmed && Prefs.isEnabled(this) && overlayView != null) {
+            Log.i(TAG, "arming lock activity")
+            LockActivity.launch(this)
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
+        isRunning = true
         createChannel()
         goForeground()
 
@@ -65,6 +75,8 @@ class LockService : Service() {
     }
 
     override fun onDestroy() {
+        isRunning = false
+        handler.removeCallbacks(armActivityRunnable)
         detachOverlay()
         LockActivity.finishIfRunning()
         screenReceiver?.let {
@@ -109,9 +121,12 @@ class LockService : Service() {
         // flash on wake). The lock activity is launched as well: being an opaque activity above
         // the running app, it makes the system stop that app - no music or gameplay continues
         // behind the lock screen. The overlay window sits above the activity, so it is never
-        // visible itself.
+        // visible itself. The activity is launched with a short delay so it does not interfere
+        // with the screen-off transition.
+        lockArmed = true
         attachOverlay()
-        LockActivity.launch(this)
+        handler.removeCallbacks(armActivityRunnable)
+        handler.postDelayed(armActivityRunnable, ARM_ACTIVITY_DELAY_MS)
     }
 
     private fun onScreenOn() {
@@ -134,6 +149,8 @@ class LockService : Service() {
             .inflate(R.layout.activity_lock, null) as? LockOverlayView ?: return
         view.onUnlocked = {
             Log.i(TAG, "overlay unlocked")
+            lockArmed = false
+            handler.removeCallbacks(armActivityRunnable)
             LockActivity.finishIfRunning()
             view.playExitAnimation { detachOverlay() }
         }
@@ -159,6 +176,8 @@ class LockService : Service() {
     private fun detachOverlay() {
         val view = overlayView ?: return
         overlayView = null
+        lockArmed = false
+        handler.removeCallbacks(armActivityRunnable)
         Log.i(TAG, "overlay detached")
         try {
             (getSystemService(Context.WINDOW_SERVICE) as WindowManager).removeView(view)
@@ -197,6 +216,11 @@ class LockService : Service() {
         private const val TAG = "PocketLock"
         private const val CHANNEL_ID = "pocketlock"
         private const val NOTIFICATION_ID = 1
+        private const val ARM_ACTIVITY_DELAY_MS = 1000L
+
+        @Volatile
+        var isRunning = false
+            private set
 
         fun start(context: Context) {
             try {

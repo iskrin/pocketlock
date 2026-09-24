@@ -158,6 +158,10 @@ class SetupActivity : Activity() {
         findViewById<TextView>(R.id.tvBatteryStatus).text =
             getString(R.string.status_battery) + ": " + yesNo(battery)
 
+        findViewById<TextView>(R.id.tvServiceStatus).text =
+            getString(R.string.status_service) + ": " +
+            if (LockService.isRunning) getString(R.string.yes) else getString(R.string.no)
+
         val sw = findViewById<Switch>(R.id.swEnabled)
         val enabled = Prefs.isEnabled(this)
         if (sw.isChecked != enabled) {

@@ -14,6 +14,7 @@
     <string name="status_overlay">\"Display over other apps\" permission (required)</string>
     <string name="status_notifications">Notifications</string>
     <string name="status_battery">Battery optimization disabled</string>
+    <string name="status_service">Lock service</string>
     <string name="btn_grant">Grant</string>
     <string name="switch_enabled">Lock enabled</string>
     <string name="checkbox_sound">Click sound</string>
