@@ -34,6 +34,7 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:showWhenLocked="true"
+            android:taskAffinity="pl.iskri.pocketlock.lock"
             android:theme="@style/LockTheme"
             android:turnScreenOn="true" />
 
