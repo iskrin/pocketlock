@@ -88,7 +88,7 @@ object Prefs {
         sp(context).edit().putFloat(KEY_BG_OFFSET_X, x).putFloat(KEY_BG_OFFSET_Y, y).apply()
     }
 
-    fun dotScale(context: Context): Float = sp(context).getFloat(KEY_DOT_SCALE, 1f)
+    fun dotScale(context: Context): Float = sp(context).getFloat(KEY_DOT_SCALE, 0.66f)
 
     fun setDotScale(context: Context, value: Float) {
         sp(context).edit().putFloat(KEY_DOT_SCALE, value).apply()
@@ -102,7 +102,7 @@ object Prefs {
 
     fun dotCenterX(context: Context): Float = sp(context).getFloat(KEY_DOT_CENTER_X, 0.5f)
 
-    fun dotCenterY(context: Context): Float = sp(context).getFloat(KEY_DOT_CENTER_Y, 0.5f)
+    fun dotCenterY(context: Context): Float = sp(context).getFloat(KEY_DOT_CENTER_Y, 0.85f)
 
     fun setDotCenter(context: Context, x: Float, y: Float) {
         sp(context).edit().putFloat(KEY_DOT_CENTER_X, x).putFloat(KEY_DOT_CENTER_Y, y).apply()

@@ -8,12 +8,14 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.WindowInsets
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -27,7 +29,6 @@ class AppearanceActivity : Activity() {
 
     private lateinit var preview: LockOverlayView
     private lateinit var previewContainer: FrameLayout
-    private lateinit var backgroundSliders: LinearLayout
     private var previewScale = 1f
     private var screenW = 1
     private var screenH = 1
@@ -107,7 +108,6 @@ class AppearanceActivity : Activity() {
         screenH = resources.displayMetrics.heightPixels
 
         previewContainer = findViewById(R.id.preview_container)
-        backgroundSliders = findViewById(R.id.background_sliders)
 
         preview = LayoutInflater.from(this)
             .inflate(R.layout.activity_lock, previewContainer, false) as LockOverlayView
@@ -123,6 +123,20 @@ class AppearanceActivity : Activity() {
             true
         }
         previewContainer.addView(preview, FrameLayout.LayoutParams(screenW, screenH))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val content = findViewById<FrameLayout>(R.id.tabs_content)
+            content.setOnApplyWindowInsetsListener { view, insets ->
+                val gestureBottom = insets.getInsets(WindowInsets.Type.systemGestures()).bottom
+                view.setPadding(
+                    view.paddingLeft,
+                    view.paddingTop,
+                    view.paddingRight,
+                    dp(72) + gestureBottom
+                )
+                insets
+            }
+        }
 
         findViewById<Button>(R.id.btnTabBackground).setOnClickListener { setTab(TAB_BACKGROUND) }
         findViewById<Button>(R.id.btnTabDots).setOnClickListener { setTab(TAB_DOTS) }
@@ -204,7 +218,6 @@ class AppearanceActivity : Activity() {
     private fun refreshPreview() {
         LockAppearance.apply(preview, this)
         preview.setPreviewState(1)
-        backgroundSliders.alpha = if (Prefs.isBackgroundEnabled(this)) 1f else 0.4f
         syncSliders()
     }
 
@@ -320,6 +333,7 @@ class AppearanceActivity : Activity() {
         val label = TextView(this).apply {
             setTextColor(0xFFCCCCCC.toInt())
             textSize = 14f
+            setPadding(0, dp(12), 0, 0)
         }
         val seekBar = SeekBar(this).apply { this.max = SLIDER_STEPS.toInt() }
         val binding = SliderBinding(seekBar, label, labelText, min, max, getValue)

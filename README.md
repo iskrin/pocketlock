@@ -1,8 +1,9 @@
 # Pocket Lock
 
 Ekran blokady dla **Retroid Pocket Nova** (Android 13) w stylu Switcha: po wybudzeniu
-konsoli pojawia się czarny ekran z 3 kropkami. Odblokowanie = 3 naciśnięcia dowolnego
-przycisku lub 3 dotknięcia ekranu. Interfejs aplikacji jest w języku angielskim.
+konsoli pojawia się ekran z 3 kropkami na tle (domyślnie wbudowany obrazek, można ustawić
+własne zdjęcie). Odblokowanie = 3 naciśnięcia dowolnego przycisku lub 3 dotknięcia ekranu.
+Interfejs aplikacji jest w języku angielskim.
 
 ## Pliki wynikowe
 
@@ -56,7 +57,8 @@ Przycisk **Appearance…** w ustawieniach otwiera ekran z podglądem blokady 1:1
 i trzema zakładkami (podgląd jest cały czas widoczny podczas regulacji):
 
 - **Background** – Choose image / Remove image (zdjęcie kopiowane do aplikacji, zmniejszane do
-  rozdzielczości ekranu, z korektą obrotu EXIF), zoom i pozycja tła.
+  rozdzielczości ekranu, z korektą obrotu EXIF), zoom i pozycja tła. Domyślnie używane jest
+  wbudowane tło (`res/drawable-nodpi/default_background.png`); **Remove image** przywraca je.
 - **Dots** – rozmiar, odstęp i pozycja kropek.
 - **Colors** – kolory kropek (aktywnej i nieaktywnej): barwa, nasycenie, jasność, krycie,
   oraz **Reset defaults**.

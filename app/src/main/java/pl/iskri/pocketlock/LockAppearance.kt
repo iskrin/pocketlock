@@ -35,7 +35,7 @@ object LockAppearance {
     }
 
     private fun applyBackground(background: ImageView, context: Context) {
-        val bitmap = if (Prefs.isBackgroundEnabled(context)) loadBackground(context) else null
+        val bitmap = loadBackground(context)
         if (bitmap == null) {
             background.visibility = View.GONE
             background.setImageDrawable(null)
@@ -99,7 +99,16 @@ object LockAppearance {
     fun loadBackground(context: Context): Bitmap? {
         cachedBitmap?.let { if (!it.isRecycled) return it }
         val file = backgroundFile(context)
-        if (!file.exists()) return null
+        val bitmap = if (Prefs.isBackgroundEnabled(context) && file.exists()) {
+            decodeFile(context, file)
+        } else {
+            decodeDefault(context)
+        }
+        cachedBitmap = bitmap
+        return bitmap
+    }
+
+    private fun decodeFile(context: Context, file: File): Bitmap? {
         return try {
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             BitmapFactory.decodeFile(file.absolutePath, bounds)
@@ -115,7 +124,18 @@ object LockAppearance {
                 inSampleSize = sample
                 inPreferredConfig = Bitmap.Config.ARGB_8888
             }
-            BitmapFactory.decodeFile(file.absolutePath, options)?.also { cachedBitmap = it }
+            BitmapFactory.decodeFile(file.absolutePath, options)
+        } catch (_: Throwable) {
+            null
+        }
+    }
+
+    private fun decodeDefault(context: Context): Bitmap? {
+        return try {
+            val options = BitmapFactory.Options().apply {
+                inPreferredConfig = Bitmap.Config.ARGB_8888
+            }
+            BitmapFactory.decodeResource(context.resources, R.drawable.default_background, options)
         } catch (_: Throwable) {
             null
         }
