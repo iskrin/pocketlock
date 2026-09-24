@@ -65,8 +65,9 @@ i trzema zakładkami (podgląd jest cały czas widoczny podczas regulacji):
   zdjęcia (np. 16:9 na 4:3 — lewo/prawo, bez czarnych pasów). Przy zoomie mniejszym niż
   dopasowanie zdjęcie jest centrowane.
 - **Dots** – rozmiar, odstęp i pozycja kropek + przycisk **Reset** dla tych suwaków.
-- **Colors** – kolory kropek (aktywnej i nieaktywnej): barwa, nasycenie, jasność, krycie,
-  oraz **Reset defaults**.
+- **Colors** – paleta gotowych kolorów dla kropek (aktywnej i nieaktywnej) — klikasz próbkę,
+  podgląd blokady cały czas widoczny; do każdego koloru suwak **Opacity** (krycie) oraz
+  **Reset defaults**.
 
 Gesty na podglądzie (przeciąganie/pinch) działają na warstwę wybranej zakładki.
 

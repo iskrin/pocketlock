@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.drawable.GradientDrawable
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
@@ -42,8 +43,13 @@ class AppearanceActivity : Activity() {
         val labelText: String,
         val min: Float,
         val max: Float,
+        val format: (Float) -> String,
         val get: () -> Float
     )
+
+    private val paletteColumns: Int by lazy {
+        ((resources.displayMetrics.widthPixels - dp(96)) / dp(42)).coerceAtLeast(4)
+    }
 
     private val sliderBindings = mutableListOf<SliderBinding>()
 
@@ -303,46 +309,80 @@ class AppearanceActivity : Activity() {
         initialColor: Int,
         onChange: (Int) -> Unit
     ) {
-        val hsv = FloatArray(3)
-        Color.colorToHSV(initialColor, hsv)
-        var hue = hsv[0]
-        var saturation = hsv[1]
-        var brightness = hsv[2]
-        var alpha = Color.alpha(initialColor) / 255f
+        var current = initialColor
 
-        val swatch = View(this)
-        swatch.layoutParams = LinearLayout.LayoutParams(dp(44), dp(44)).apply {
-            topMargin = dp(6)
-            bottomMargin = dp(6)
-        }
-        swatch.setBackgroundColor(initialColor)
-        parent.addView(swatch)
+        val palette = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        parent.addView(palette)
 
-        fun push() {
-            val color = Color.HSVToColor(
-                (alpha * 255f).roundToInt(),
-                floatArrayOf(hue, saturation, brightness)
-            )
-            swatch.setBackgroundColor(color)
-            onChange(color)
+        fun rebuildPalette() {
+            palette.removeAllViews()
+            val base = current and 0x00FFFFFF
+            var row: LinearLayout? = null
+            PALETTE.forEachIndexed { index, color ->
+                if (index % paletteColumns == 0) {
+                    row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+                    palette.addView(row)
+                }
+                val swatch = View(this)
+                val size = dp(36)
+                swatch.layoutParams = LinearLayout.LayoutParams(size, size).apply {
+                    marginStart = dp(3)
+                    marginEnd = dp(3)
+                    topMargin = dp(3)
+                    bottomMargin = dp(3)
+                }
+                val selected = (color and 0x00FFFFFF) == base
+                swatch.background = swatchDrawable(color, selected)
+                if (selected) {
+                    swatch.scaleX = 1.15f
+                    swatch.scaleY = 1.15f
+                }
+                swatch.setOnClickListener {
+                    current = withAlpha(color, Color.alpha(current))
+                    onChange(current)
+                    rebuildPalette()
+                }
+                row?.addView(swatch)
+            }
         }
 
-        addSlider(parent, getString(R.string.appearance_hue), 0f, 360f, { hue }, false) {
-            hue = it
-            push()
+        addSlider(
+            parent,
+            getString(R.string.appearance_alpha),
+            0f,
+            1f,
+            { Color.alpha(current) / 255f },
+            false,
+            { "${(it * 100f).roundToInt()}%" }
+        ) { value ->
+            current = withAlpha(current, (value * 255f).roundToInt())
+            onChange(current)
         }
-        addSlider(parent, getString(R.string.appearance_saturation), 0f, 1f, { saturation }, false) {
-            saturation = it
-            push()
+
+        rebuildPalette()
+    }
+
+    private fun withAlpha(color: Int, alpha: Int): Int =
+        (color and 0x00FFFFFF) or ((alpha.coerceIn(0, 255)) shl 24)
+
+    private fun swatchDrawable(color: Int, selected: Boolean): GradientDrawable {
+        val ring = when {
+            selected && isLight(color) -> 0xFF222222.toInt()
+            selected -> 0xFFFFFFFF.toInt()
+            else -> 0x33FFFFFF
         }
-        addSlider(parent, getString(R.string.appearance_brightness), 0f, 1f, { brightness }, false) {
-            brightness = it
-            push()
+        return GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(color)
+            setStroke(if (selected) dp(3) else dp(1), ring)
         }
-        addSlider(parent, getString(R.string.appearance_alpha), 0f, 1f, { alpha }, false) {
-            alpha = it
-            push()
-        }
+    }
+
+    private fun isLight(color: Int): Boolean {
+        val r = Color.red(color) / 255f
+        val g = Color.green(color) / 255f
+        val b = Color.blue(color) / 255f
+        return 0.299f * r + 0.587f * g + 0.114f * b > 0.6f
     }
 
     private fun addSlider(
@@ -352,6 +392,7 @@ class AppearanceActivity : Activity() {
         max: Float,
         getValue: () -> Float,
         register: Boolean = true,
+        format: (Float) -> String = { formatValue(it) },
         onChange: (Float) -> Unit
     ): SliderBinding {
         val label = TextView(this).apply {
@@ -360,17 +401,17 @@ class AppearanceActivity : Activity() {
             setPadding(0, dp(12), 0, 0)
         }
         val seekBar = SeekBar(this).apply { this.max = SLIDER_STEPS.toInt() }
-        val binding = SliderBinding(seekBar, label, labelText, min, max, getValue)
+        val binding = SliderBinding(seekBar, label, labelText, min, max, format, getValue)
         if (register) {
             sliderBindings += binding
         }
         seekBar.progress = progressFor(min, max, getValue())
-        label.text = "$labelText: ${formatValue(getValue())}"
+        label.text = "$labelText: ${format(getValue())}"
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(bar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (!fromUser || updating) return
                 val value = valueFor(min, max, progress)
-                label.text = "$labelText: ${formatValue(value)}"
+                label.text = "$labelText: ${format(value)}"
                 onChange(value)
             }
 
@@ -388,7 +429,7 @@ class AppearanceActivity : Activity() {
         for (binding in sliderBindings) {
             val value = binding.get()
             binding.seekBar.progress = progressFor(binding.min, binding.max, value)
-            binding.label.text = "${binding.labelText}: ${formatValue(value)}"
+            binding.label.text = "${binding.labelText}: ${binding.format(value)}"
         }
         updating = false
     }
@@ -536,5 +577,26 @@ class AppearanceActivity : Activity() {
         const val TAB_COLORS = 2
         const val SLIDER_STEPS = 1000f
         const val MAX_DIMENSION = 4096
+
+        val PALETTE = intArrayOf(
+            0xFFFFFFFF.toInt(),
+            0xFFB0BEC5.toInt(),
+            0xFF78909C.toInt(),
+            0xFF455A64.toInt(),
+            0xFF000000.toInt(),
+            0xFFF44336.toInt(),
+            0xFFFF9800.toInt(),
+            0xFFFFC107.toInt(),
+            0xFFFFEB3B.toInt(),
+            0xFF8BC34A.toInt(),
+            0xFF4CAF50.toInt(),
+            0xFF009688.toInt(),
+            0xFF00BCD4.toInt(),
+            0xFF2196F3.toInt(),
+            0xFF3F51B5.toInt(),
+            0xFF9C27B0.toInt(),
+            0xFFE91E63.toInt(),
+            0xFFFF4081.toInt()
+        )
     }
 }

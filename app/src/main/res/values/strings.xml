@@ -45,9 +45,6 @@
     <string name="appearance_dot_y">Position Y</string>
     <string name="appearance_color_active">Active dot color</string>
     <string name="appearance_color_inactive">Inactive dot color</string>
-    <string name="appearance_hue">Hue</string>
-    <string name="appearance_saturation">Saturation</string>
-    <string name="appearance_brightness">Brightness</string>
     <string name="appearance_alpha">Opacity</string>
     <string name="appearance_import_failed">Could not load the selected image.</string>
     <string name="appearance_processing">Processing image…</string>
