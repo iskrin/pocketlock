@@ -284,8 +284,10 @@ class LockOverlayView @JvmOverloads constructor(
 
     private fun initSound() {
         if (soundPool != null) return
+        // System stream (not media): the media stream is muted while the lock is up, and the
+        // press feedback must stay audible.
         val attributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_GAME)
+            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .build()
         val pool = SoundPool.Builder()

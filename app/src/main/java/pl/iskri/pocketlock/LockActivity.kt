@@ -93,9 +93,18 @@ class LockActivity : Activity() {
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
+        // PauseActivity deliberately covers this task to stop emulators that ignore onPause.
+        // Relaunching LockActivity here would remove PauseActivity because both activities share
+        // this task affinity.
+        if (PauseActivity.isLaunchingOrRunning()) return
         if (!unlocking && isInteractive()) {
             handler.postDelayed({
-                if (!unlocking && isInteractive() && !isFinishing && !isDestroyed) {
+                if (!PauseActivity.isLaunchingOrRunning()
+                    && !unlocking
+                    && isInteractive()
+                    && !isFinishing
+                    && !isDestroyed
+                ) {
                     launch(this)
                 }
             }, 150)

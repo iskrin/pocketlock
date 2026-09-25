@@ -3,6 +3,7 @@ package pl.iskri.pocketlock
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.AppOpsManager
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
@@ -70,6 +71,13 @@ class SetupActivity : Activity() {
                 )
             } catch (_: Exception) {
                 startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION))
+            }
+        }
+
+        findViewById<Button>(R.id.btnUsage).setOnClickListener {
+            try {
+                startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+            } catch (_: Exception) {
             }
         }
 
@@ -261,6 +269,8 @@ class SetupActivity : Activity() {
 
         findViewById<TextView>(R.id.tvOverlayStatus).text =
             getString(R.string.status_overlay) + ": " + yesNo(overlay)
+        findViewById<TextView>(R.id.tvUsageStatus).text =
+            getString(R.string.status_usage_access) + ": " + yesNo(hasUsageAccess())
         findViewById<TextView>(R.id.tvNotificationStatus).text =
             getString(R.string.status_notifications) + ": " + yesNo(notifications)
         findViewById<TextView>(R.id.tvBatteryStatus).text =
@@ -285,6 +295,15 @@ class SetupActivity : Activity() {
 
     private fun yesNo(value: Boolean): String =
         if (value) getString(R.string.yes) else getString(R.string.no)
+
+    private fun hasUsageAccess(): Boolean {
+        val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        return appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            applicationInfo.uid,
+            packageName
+        ) == AppOpsManager.MODE_ALLOWED
+    }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).roundToInt()
 

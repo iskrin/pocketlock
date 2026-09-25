@@ -5,9 +5,20 @@
         <item name="android:colorAccent">#7C4DFF</item>
     </style>
 
-    <style name="LockTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+    <style name="PauseTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:colorBackground">@android:color/black</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <style name="LockTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <!-- Translucent window: the app below stays visible (paused, not stopped), so it never
+             re-creates its window/GL context because of the lock (which flashes and can crash
+             some emulators). Apps that ignore onPause are stopped on demand by PauseActivity. -->
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
         <item name="android:windowShowWallpaper">false</item>
         <item name="android:windowAnimationStyle">@null</item>
     </style>

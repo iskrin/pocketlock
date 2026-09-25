@@ -18,6 +18,7 @@ object Prefs {
     const val ANIMATION_FADE_SLIDE = "fade_slide"
     private const val KEY_SOUND = "sound_status"
     private const val KEY_SOUND_ENABLED = "sound_enabled"
+    private const val KEY_MEDIA_MUTED = "media_muted"
     private const val KEY_VIBRATION_ENABLED = "vibration_enabled"
     private const val KEY_NOTIFICATION_ENABLED = "notification_enabled"
     private const val KEY_SCREEN_OFF_SECONDS = "screen_off_seconds"
@@ -103,6 +104,14 @@ object Prefs {
 
     fun setSoundStatus(context: Context, value: String) {
         sp(context).edit().putString(KEY_SOUND, value).apply()
+    }
+
+    /** Whether the media stream was muted by the lock and still has to be restored. */
+    fun mediaMuted(context: Context): Boolean =
+        sp(context).getBoolean(KEY_MEDIA_MUTED, false)
+
+    fun setMediaMuted(context: Context, muted: Boolean) {
+        sp(context).edit().putBoolean(KEY_MEDIA_MUTED, muted).apply()
     }
 
     fun isBackgroundEnabled(context: Context): Boolean =

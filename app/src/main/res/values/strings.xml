@@ -12,6 +12,7 @@
     <string name="tab_options">Options</string>
 
     <string name="status_overlay">\"Display over other apps\" permission (required)</string>
+    <string name="status_usage_access">Usage access (required to pause emulators safely)</string>
     <string name="status_notifications">Notifications</string>
     <string name="status_battery">Battery optimization disabled</string>
     <string name="status_service">Lock service</string>
@@ -64,5 +65,5 @@
     <string name="appearance_import_failed">Could not load the selected image.</string>
     <string name="appearance_processing">Processing image…</string>
 
-    <string name="instructions">Console setup:\n\n1. Grant the \"Display over other apps\" permission — without it the lock screen will not appear on wake.\n2. Settings → Security → Screen lock → set \"None\" (recommended: the lock works as an overlay with no flash of the game) or \"Swipe\".\n3. Turn on the \"Lock enabled\" switch above.\n4. Disable battery optimization so the system does not kill the background service.\n5. To have the screen turn off automatically when you do not unlock it, grant the "Device administrator" permission and choose a time in "Screen off after".\n\nUnlock: press any button or tap the screen 3 times.</string>
+    <string name="instructions">Console setup:\n\n1. Grant the \"Display over other apps\" permission — without it the lock screen will not appear on wake.\n2. Grant \"Usage access\" — it lets Pocket Lock distinguish RetroArch from emulators that need to be stopped.\n3. Settings → Security → Screen lock → set \"None\" (recommended: the lock works as an overlay with no flash of the game) or \"Swipe\".\n4. Turn on the \"Lock enabled\" switch above.\n5. Disable battery optimization so the system does not kill the background service.\n6. To have the screen turn off automatically when you do not unlock it, grant the "Device administrator" permission and choose a time in "Screen off after".\n\nUnlock: press any button or tap the screen 3 times.</string>
 </resources>
