@@ -7,6 +7,15 @@ object Prefs {
     private const val FILE = "pocketlock"
     private const val KEY_ENABLED = "enabled"
     private const val KEY_LAST_KEY = "last_key"
+    private const val KEY_ANIMATION_TYPE = "animation_type"
+    private const val KEY_BARS_VISIBLE = "bars_visible"
+
+    const val ANIMATION_SLIDE_DOWN = "slide_down"
+    const val ANIMATION_SLIDE_UP = "slide_up"
+    const val ANIMATION_FADE = "fade"
+    const val ANIMATION_ZOOM_OUT = "zoom_out"
+    const val ANIMATION_ZOOM_IN = "zoom_in"
+    const val ANIMATION_FADE_SLIDE = "fade_slide"
     private const val KEY_SOUND = "sound_status"
     private const val KEY_SOUND_ENABLED = "sound_enabled"
     private const val KEY_VIBRATION_ENABLED = "vibration_enabled"
@@ -60,6 +69,26 @@ object Prefs {
 
     fun setScreenOffSeconds(context: Context, seconds: Int) {
         sp(context).edit().putInt(KEY_SCREEN_OFF_SECONDS, seconds).apply()
+    }
+
+    /** Whether the system bars were visible before the screen was locked; null if unknown. */
+    fun barsVisible(context: Context): Boolean? =
+        if (sp(context).contains(KEY_BARS_VISIBLE)) {
+            sp(context).getBoolean(KEY_BARS_VISIBLE, false)
+        } else {
+            null
+        }
+
+    fun setBarsVisible(context: Context, visible: Boolean) {
+        sp(context).edit().putBoolean(KEY_BARS_VISIBLE, visible).apply()
+    }
+
+    fun animationType(context: Context): String =
+        sp(context).getString(KEY_ANIMATION_TYPE, ANIMATION_SLIDE_DOWN)
+            ?: ANIMATION_SLIDE_DOWN
+
+    fun setAnimationType(context: Context, value: String) {
+        sp(context).edit().putString(KEY_ANIMATION_TYPE, value).apply()
     }
 
     fun lastKey(context: Context): String =

@@ -237,6 +237,21 @@
                     android:textColor="#AAAAAA"
                     android:textSize="13sp" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/animation_type_label"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/spAnimation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:spinnerMode="dropdown" />
+
                 <CheckBox
                     android:id="@+id/cbNotification"
                     android:layout_width="match_parent"

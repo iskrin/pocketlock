@@ -14,6 +14,7 @@ import android.graphics.PixelFormat
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -22,6 +23,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.WindowInsets
 import android.view.WindowManager
 
 class LockService : Service() {
@@ -129,6 +131,24 @@ class LockService : Service() {
         // behind the lock screen. The overlay window sits above the activity, so it is never
         // visible itself. The activity is launched with a short delay so it does not interfere
         // with the screen-off transition.
+        //
+        // A fresh lock must always start with an empty press counter: if the screen went off
+        // while the user had already pressed some keys, the old overlay view (and its counter)
+        // would otherwise be reused and fewer presses would unlock. Re-creating the view also
+        // covers the rare case of the screen going off mid-unlock.
+        val wasArmed = lockArmed
+        detachOverlay()
+        if (!wasArmed) {
+            // Remember whether the app in the foreground shows the system bars (non-fullscreen
+            // app) or hides them (fullscreen game). On unlock the bars are only restored early
+            // for the former; showing them for a fullscreen app would flash over the lock
+            // screen. Not sampled again when the screen just went off while still locked: the
+            // lock activity would be hiding the bars and the stored value would be wrong.
+            val barsVisible = sampleSystemBarsVisible()
+            Log.i(TAG, "system bars visible before lock: $barsVisible")
+            Prefs.setBarsVisible(this, barsVisible)
+        }
+        LockActivity.resetPresses()
         lockArmed = true
         ScreenTimeout.cancel()
         attachOverlay()
@@ -160,15 +180,7 @@ class LockService : Service() {
         val view = LayoutInflater.from(this)
             .inflate(R.layout.activity_lock, null) as? LockOverlayView ?: return
         view.onPress = { ScreenTimeout.start(this) }
-        view.onUnlocked = {
-            Log.i(TAG, "overlay unlocked")
-            lockArmed = false
-            handler.removeCallbacks(armActivityRunnable)
-            ScreenTimeout.cancel()
-            abandonAudioFocus(this)
-            LockActivity.finishIfRunning()
-            view.playExitAnimation { detachOverlay() }
-        }
+        view.onUnlocked = { performUnlock(view) }
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -189,6 +201,50 @@ class LockService : Service() {
         }
     }
 
+    private fun performUnlock(view: LockOverlayView) {
+        Log.i(TAG, "overlay unlocked")
+        lockArmed = false
+        handler.removeCallbacks(armActivityRunnable)
+        ScreenTimeout.cancel()
+        // While locked, this overlay window holds the focus and is therefore the system bar
+        // control target. Its own "hide system bars" request would immediately re-hide the
+        // bars that LockActivity restores when finishing, so the app below would be laid out
+        // without them and jump when they reappear after the unlock animation. Release the
+        // focus (the finishing activity/app takes over) and stop hiding the bars.
+        try {
+            val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val params = view.layoutParams as WindowManager.LayoutParams
+            params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+            windowManager.updateViewLayout(view, params)
+        } catch (_: Throwable) {
+        }
+        view.showSystemBars()
+        // The audio focus is abandoned in detachOverlay(), i.e. after the slide: it keeps
+        // media paused during the short (invisible) handoff to the app.
+        LockActivity.finishIfRunning(
+            showSystemBars = Prefs.barsVisible(this) ?: false
+        )
+        view.playExitAnimation { detachOverlay() }
+    }
+
+    /**
+     * Whether the system bars are currently visible on the display. Called on screen-off,
+     * before the lock activity hides them, so it reflects the foreground app's own state.
+     */
+    private fun sampleSystemBarsVisible(): Boolean {
+        return try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                false
+            } else {
+                val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+                val insets = windowManager.currentWindowMetrics.windowInsets
+                insets.isVisible(WindowInsets.Type.statusBars())
+            }
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
     private fun detachOverlay() {
         val view = overlayView ?: return
         overlayView = null
@@ -196,6 +252,7 @@ class LockService : Service() {
         isOverlayAttached = false
         handler.removeCallbacks(armActivityRunnable)
         ScreenTimeout.cancel()
+        abandonAudioFocus(this)
         Log.i(TAG, "overlay detached")
         try {
             (getSystemService(Context.WINDOW_SERVICE) as WindowManager).removeView(view)

@@ -35,6 +35,16 @@ class SetupActivity : Activity() {
     // Values of the "Screen off after" spinner, in seconds; 0 means "never".
     private val screenTimeoutValues = intArrayOf(5, 10, 15, 30, 60, 120, 0)
 
+    // Values of the "Unlock animation" spinner.
+    private val animationValues = arrayOf(
+        Prefs.ANIMATION_SLIDE_DOWN,
+        Prefs.ANIMATION_SLIDE_UP,
+        Prefs.ANIMATION_FADE,
+        Prefs.ANIMATION_ZOOM_OUT,
+        Prefs.ANIMATION_ZOOM_IN,
+        Prefs.ANIMATION_FADE_SLIDE
+    )
+
     private val enabledListener = CompoundButton.OnCheckedChangeListener { _, checked ->
         Prefs.setEnabled(this, checked)
         if (checked) LockService.start(this) else LockService.stop(this)
@@ -142,6 +152,37 @@ class SetupActivity : Activity() {
                         Toast.LENGTH_LONG
                     ).show()
                 }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        val animationSpinner = findViewById<Spinner>(R.id.spAnimation)
+        val animationLabels = animationValues.map { value ->
+            when (value) {
+                Prefs.ANIMATION_SLIDE_UP -> getString(R.string.animation_slide_up)
+                Prefs.ANIMATION_FADE -> getString(R.string.animation_fade)
+                Prefs.ANIMATION_ZOOM_OUT -> getString(R.string.animation_zoom_out)
+                Prefs.ANIMATION_ZOOM_IN -> getString(R.string.animation_zoom_in)
+                Prefs.ANIMATION_FADE_SLIDE -> getString(R.string.animation_fade_slide)
+                else -> getString(R.string.animation_slide_down)
+            }
+        }
+        animationSpinner.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_item, animationLabels).apply {
+                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            }
+        val animationIndex = animationValues.indexOf(Prefs.animationType(this))
+        animationSpinner.setSelection(if (animationIndex >= 0) animationIndex else 0)
+        animationSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                Prefs.setAnimationType(this@SetupActivity, animationValues[position])
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
