@@ -201,7 +201,10 @@ class LockService : Service() {
             lockedPackage = packageBeforeLock
             Log.i(TAG, "app before lock: ${lockedPackage ?: "unknown"}")
         }
-        LockActivity.resetPresses()
+        if (!Prefs.rememberPresses(this)) {
+            Prefs.setPressCount(this, 0)
+            LockActivity.resetPresses()
+        }
         lockArmed = true
         earlyResumeDone = false
         audioActiveCount = 0
@@ -363,6 +366,7 @@ class LockService : Service() {
     private fun performUnlock(view: LockOverlayView) {
         Log.i(TAG, "overlay unlocked")
         lockArmed = false
+        Prefs.setPressCount(this, 0)
         earlyResumeDone = false
         handler.removeCallbacks(audioCheckRunnable)
         PauseActivity.finishIfRunning()
@@ -409,6 +413,7 @@ class LockService : Service() {
     private fun detachOverlay(unmuteMedia: Boolean = false) {
         if (unmuteMedia) {
             unmuteMedia()
+            Prefs.setPressCount(this, 0)
         }
         handler.removeCallbacks(audioCheckRunnable)
         PauseActivity.finishIfRunning()

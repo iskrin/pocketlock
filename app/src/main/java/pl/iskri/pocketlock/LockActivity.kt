@@ -121,6 +121,7 @@ class LockActivity : Activity() {
 
     private fun unlock() {
         unlocking = true
+        Prefs.setPressCount(this, 0)
         ScreenTimeout.cancel()
         val km = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         if (km.isKeyguardLocked) {

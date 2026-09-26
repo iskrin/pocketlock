@@ -8,6 +8,8 @@ object Prefs {
     private const val KEY_ENABLED = "enabled"
     private const val KEY_LAST_KEY = "last_key"
     private const val KEY_ANIMATION_TYPE = "animation_type"
+    private const val KEY_ANIMATION_DURATION = "animation_duration"
+    private const val DEFAULT_ANIMATION_DURATION = 350
     private const val KEY_BARS_VISIBLE = "bars_visible"
 
     const val ANIMATION_SLIDE_DOWN = "slide_down"
@@ -23,6 +25,8 @@ object Prefs {
     private const val KEY_NOTIFICATION_ENABLED = "notification_enabled"
     private const val KEY_SCREEN_OFF_SECONDS = "screen_off_seconds"
     private const val DEFAULT_SCREEN_OFF_SECONDS = 10
+    private const val KEY_REMEMBER_PRESSES = "remember_presses"
+    private const val KEY_PRESS_COUNT = "press_count"
 
     private const val KEY_BG_ENABLED = "bg_enabled"
     private const val KEY_BG_SCALE = "bg_scale"
@@ -72,6 +76,20 @@ object Prefs {
         sp(context).edit().putInt(KEY_SCREEN_OFF_SECONDS, seconds).apply()
     }
 
+    /** Whether the already-pressed dots are kept when the screen turns off again. */
+    fun rememberPresses(context: Context): Boolean =
+        sp(context).getBoolean(KEY_REMEMBER_PRESSES, false)
+
+    fun setRememberPresses(context: Context, enabled: Boolean) {
+        sp(context).edit().putBoolean(KEY_REMEMBER_PRESSES, enabled).apply()
+    }
+
+    fun pressCount(context: Context): Int = sp(context).getInt(KEY_PRESS_COUNT, 0)
+
+    fun setPressCount(context: Context, count: Int) {
+        sp(context).edit().putInt(KEY_PRESS_COUNT, count).apply()
+    }
+
     /** Whether the system bars were visible before the screen was locked; null if unknown. */
     fun barsVisible(context: Context): Boolean? =
         if (sp(context).contains(KEY_BARS_VISIBLE)) {
@@ -90,6 +108,13 @@ object Prefs {
 
     fun setAnimationType(context: Context, value: String) {
         sp(context).edit().putString(KEY_ANIMATION_TYPE, value).apply()
+    }
+
+    fun animationDuration(context: Context): Int =
+        sp(context).getInt(KEY_ANIMATION_DURATION, DEFAULT_ANIMATION_DURATION)
+
+    fun setAnimationDuration(context: Context, value: Int) {
+        sp(context).edit().putInt(KEY_ANIMATION_DURATION, value).apply()
     }
 
     fun lastKey(context: Context): String =

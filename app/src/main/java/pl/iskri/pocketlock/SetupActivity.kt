@@ -46,6 +46,9 @@ class SetupActivity : Activity() {
         Prefs.ANIMATION_FADE_SLIDE
     )
 
+    // Values of the "Animation duration" spinner, in milliseconds.
+    private val animationDurationValues = intArrayOf(150, 250, 350, 500, 750)
+
     private val enabledListener = CompoundButton.OnCheckedChangeListener { _, checked ->
         Prefs.setEnabled(this, checked)
         if (checked) LockService.start(this) else LockService.stop(this)
@@ -118,6 +121,15 @@ class SetupActivity : Activity() {
             Prefs.setVibrationEnabled(this, checked)
         }
 
+        val cbRememberPresses = findViewById<CheckBox>(R.id.cbRememberPresses)
+        cbRememberPresses.isChecked = Prefs.rememberPresses(this)
+        cbRememberPresses.setOnCheckedChangeListener { _, checked ->
+            Prefs.setRememberPresses(this, checked)
+            if (!checked) {
+                Prefs.setPressCount(this, 0)
+            }
+        }
+
         val cbNotification = findViewById<CheckBox>(R.id.cbNotification)
         cbNotification.isChecked = Prefs.isNotificationEnabled(this)
         cbNotification.setOnCheckedChangeListener { _, checked ->
@@ -136,8 +148,8 @@ class SetupActivity : Activity() {
             }
         }
         timeoutSpinner.adapter =
-            ArrayAdapter(this, android.R.layout.simple_spinner_item, timeoutLabels).apply {
-                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            ArrayAdapter(this, R.layout.spinner_item, timeoutLabels).apply {
+                setDropDownViewResource(R.layout.spinner_dropdown_item)
             }
         val timeoutIndex = screenTimeoutValues.indexOf(Prefs.screenOffSeconds(this))
         timeoutSpinner.setSelection(
@@ -178,8 +190,8 @@ class SetupActivity : Activity() {
             }
         }
         animationSpinner.adapter =
-            ArrayAdapter(this, android.R.layout.simple_spinner_item, animationLabels).apply {
-                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            ArrayAdapter(this, R.layout.spinner_item, animationLabels).apply {
+                setDropDownViewResource(R.layout.spinner_dropdown_item)
             }
         val animationIndex = animationValues.indexOf(Prefs.animationType(this))
         animationSpinner.setSelection(if (animationIndex >= 0) animationIndex else 0)
@@ -191,6 +203,32 @@ class SetupActivity : Activity() {
                 id: Long
             ) {
                 Prefs.setAnimationType(this@SetupActivity, animationValues[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        val durationSpinner = findViewById<Spinner>(R.id.spAnimationDuration)
+        val durationLabels = animationDurationValues.map { ms ->
+            getString(R.string.animation_duration_ms, ms)
+        }
+        durationSpinner.adapter =
+            ArrayAdapter(this, R.layout.spinner_item, durationLabels).apply {
+                setDropDownViewResource(R.layout.spinner_dropdown_item)
+            }
+        val durationIndex = animationDurationValues.indexOf(Prefs.animationDuration(this))
+        durationSpinner.setSelection(
+            if (durationIndex >= 0) durationIndex else animationDurationValues.indexOf(350)
+        )
+        durationSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                Prefs.setAnimationDuration(this@SetupActivity, animationDurationValues[position])
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

@@ -82,119 +82,169 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/status_overlay"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp" />
+                <pl.iskri.pocketlock.WrappingRowLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/tvOverlayStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#AAAAAA"
-                    android:textSize="14sp" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/btnOverlay"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/btn_grant" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/status_overlay"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/status_usage_access"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp" />
+                        <TextView
+                            android:id="@+id/tvOverlayStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="#AAAAAA"
+                            android:textSize="14sp" />
+                    </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvUsageStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#AAAAAA"
-                    android:textSize="14sp" />
+                    <Button
+                        android:id="@+id/btnOverlay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_grant" />
+                </pl.iskri.pocketlock.WrappingRowLayout>
 
-                <Button
-                    android:id="@+id/btnUsage"
-                    android:layout_width="wrap_content"
+                <pl.iskri.pocketlock.WrappingRowLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/btn_grant" />
+                    android:layout_marginTop="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/status_notifications"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvNotificationStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#AAAAAA"
-                    android:textSize="14sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/status_usage_access"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp" />
 
-                <Button
-                    android:id="@+id/btnNotification"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/btn_grant" />
+                        <TextView
+                            android:id="@+id/tvUsageStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="#AAAAAA"
+                            android:textSize="14sp" />
+                    </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/status_battery"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp" />
+                    <Button
+                        android:id="@+id/btnUsage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_grant" />
+                </pl.iskri.pocketlock.WrappingRowLayout>
 
-                <TextView
-                    android:id="@+id/tvBatteryStatus"
-                    android:layout_width="wrap_content"
+                <pl.iskri.pocketlock.WrappingRowLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#AAAAAA"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="16dp">
 
-                <Button
-                    android:id="@+id/btnBattery"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/btn_grant" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/status_device_admin"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/status_notifications"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/tvAdminStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#AAAAAA"
-                    android:textSize="14sp" />
+                        <TextView
+                            android:id="@+id/tvNotificationStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="#AAAAAA"
+                            android:textSize="14sp" />
+                    </LinearLayout>
 
-                <Button
-                    android:id="@+id/btnAdmin"
-                    android:layout_width="wrap_content"
+                    <Button
+                        android:id="@+id/btnNotification"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_grant" />
+                </pl.iskri.pocketlock.WrappingRowLayout>
+
+                <pl.iskri.pocketlock.WrappingRowLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/btn_grant" />
+                    android:layout_marginTop="16dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/status_battery"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/tvBatteryStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="#AAAAAA"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnBattery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_grant" />
+                </pl.iskri.pocketlock.WrappingRowLayout>
+
+                <pl.iskri.pocketlock.WrappingRowLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/status_device_admin"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/tvAdminStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="#AAAAAA"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnAdmin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_grant" />
+                </pl.iskri.pocketlock.WrappingRowLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -237,6 +287,23 @@
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
 
+                <CheckBox
+                    android:id="@+id/cbRememberPresses"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/checkbox_remember_presses"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/remember_presses_hint"
+                    android:textColor="#AAAAAA"
+                    android:textSize="13sp" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -247,9 +314,12 @@
 
                 <Spinner
                     android:id="@+id/spScreenTimeout"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
+                    android:minWidth="200dp"
+                    android:background="@drawable/bg_spinner"
+                    android:popupBackground="@drawable/bg_spinner_popup"
                     android:spinnerMode="dropdown" />
 
                 <TextView
@@ -270,9 +340,30 @@
 
                 <Spinner
                     android:id="@+id/spAnimation"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
+                    android:minWidth="200dp"
+                    android:background="@drawable/bg_spinner"
+                    android:popupBackground="@drawable/bg_spinner_popup"
+                    android:spinnerMode="dropdown" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/animation_duration_label"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/spAnimationDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:minWidth="200dp"
+                    android:background="@drawable/bg_spinner"
+                    android:popupBackground="@drawable/bg_spinner_popup"
                     android:spinnerMode="dropdown" />
 
                 <CheckBox

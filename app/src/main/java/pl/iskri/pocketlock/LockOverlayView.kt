@@ -60,6 +60,10 @@ class LockOverlayView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         if (!interactive) return
+        if (Prefs.rememberPresses(context)) {
+            presses = Prefs.pressCount(context).coerceIn(0, REQUIRED_PRESSES)
+            updateDots()
+        }
         requestFocus()
         hideSystemBars()
         initSound()
@@ -93,6 +97,7 @@ class LockOverlayView @JvmOverloads constructor(
 
     fun resetPresses() {
         presses = 0
+        Prefs.setPressCount(context, 0)
         updateDots()
     }
 
@@ -187,31 +192,33 @@ class LockOverlayView @JvmOverloads constructor(
         }
         // Fallback in case an animator's end action is never delivered (e.g. the window is
         // removed mid-animation).
-        postDelayed({ finishExit(onEnd) }, FALLBACK_EXIT_MS)
+        val duration = Prefs.animationDuration(context).toLong()
+        postDelayed({ finishExit(onEnd) }, duration + FALLBACK_EXTRA_MS)
         when (Prefs.animationType(context)) {
-            Prefs.ANIMATION_FADE -> playFadeExit(onEnd)
-            Prefs.ANIMATION_ZOOM_OUT -> playZoomExit(onEnd, ZOOM_OUT_SCALE)
-            Prefs.ANIMATION_ZOOM_IN -> playZoomExit(onEnd, ZOOM_IN_SCALE)
-            Prefs.ANIMATION_FADE_SLIDE -> playFadeSlideExit(onEnd)
-            Prefs.ANIMATION_SLIDE_UP -> playSlideExit(onEnd, up = true)
-            else -> playSlideExit(onEnd, up = false)
+            Prefs.ANIMATION_FADE -> playFadeExit(onEnd, duration)
+            Prefs.ANIMATION_ZOOM_OUT -> playZoomExit(onEnd, ZOOM_OUT_SCALE, duration)
+            Prefs.ANIMATION_ZOOM_IN -> playZoomExit(onEnd, ZOOM_IN_SCALE, duration)
+            Prefs.ANIMATION_FADE_SLIDE -> playFadeSlideExit(onEnd, duration)
+            Prefs.ANIMATION_SLIDE_UP -> playSlideExit(onEnd, up = true, duration = duration)
+            else -> playSlideExit(onEnd, up = false, duration = duration)
         }
     }
 
     private fun exitDistance(): Float =
         if (height > 0) height.toFloat() else resources.displayMetrics.heightPixels.toFloat()
 
-    private fun playSlideExit(onEnd: () -> Unit, up: Boolean) {
+    private fun playSlideExit(onEnd: () -> Unit, up: Boolean, duration: Long) {
         val distance = exitDistance()
         // Fade out during the last part of the slide, so that even if a final frame is drawn
         // late (busy device) it is fully transparent.
+        val fadeDuration = (duration / 3).coerceAtLeast(1L)
         ObjectAnimator.ofFloat(this, "alpha", 1f, 0f).apply {
-            startDelay = EXIT_DURATION_MS - FADE_DURATION_MS
-            duration = FADE_DURATION_MS
+            startDelay = duration - fadeDuration
+            this.duration = fadeDuration
         }.start()
         animate()
             .translationY(if (up) -distance else distance)
-            .setDuration(EXIT_DURATION_MS)
+            .setDuration(duration)
             .setInterpolator(AccelerateInterpolator(1.7f))
             .withEndAction {
                 alpha = 0f
@@ -221,14 +228,14 @@ class LockOverlayView @JvmOverloads constructor(
             .start()
     }
 
-    private fun playFadeSlideExit(onEnd: () -> Unit) {
+    private fun playFadeSlideExit(onEnd: () -> Unit, duration: Long) {
         // Fade over the whole slide instead of only its last part.
         ObjectAnimator.ofFloat(this, "alpha", 1f, 0f).apply {
-            duration = EXIT_DURATION_MS
+            this.duration = duration
         }.start()
         animate()
             .translationY(exitDistance())
-            .setDuration(EXIT_DURATION_MS)
+            .setDuration(duration)
             .setInterpolator(AccelerateInterpolator(1.7f))
             .withEndAction {
                 alpha = 0f
@@ -237,20 +244,20 @@ class LockOverlayView @JvmOverloads constructor(
             .start()
     }
 
-    private fun playFadeExit(onEnd: () -> Unit) {
+    private fun playFadeExit(onEnd: () -> Unit, duration: Long) {
         animate()
             .alpha(0f)
-            .setDuration(FADE_EXIT_MS)
+            .setDuration(duration)
             .withEndAction { postOnAnimation { finishExit(onEnd) } }
             .start()
     }
 
-    private fun playZoomExit(onEnd: () -> Unit, targetScale: Float) {
+    private fun playZoomExit(onEnd: () -> Unit, targetScale: Float, duration: Long) {
         animate()
             .scaleX(targetScale)
             .scaleY(targetScale)
             .alpha(0f)
-            .setDuration(ZOOM_EXIT_MS)
+            .setDuration(duration)
             .setInterpolator(AccelerateInterpolator(1.2f))
             .withEndAction {
                 alpha = 0f
@@ -268,6 +275,9 @@ class LockOverlayView @JvmOverloads constructor(
     private fun registerPress() {
         if (!interactive || unlocked) return
         if (presses < REQUIRED_PRESSES) presses++
+        if (Prefs.rememberPresses(context)) {
+            Prefs.setPressCount(context, presses)
+        }
         updateDots()
         onPress?.invoke()
         if (Prefs.isVibrationEnabled(context)) {
@@ -323,13 +333,9 @@ class LockOverlayView @JvmOverloads constructor(
 
     companion object {
         const val REQUIRED_PRESSES = 3
-        const val EXIT_DURATION_MS = 350L
-        private const val FADE_DURATION_MS = 120L
-        private const val FADE_EXIT_MS = 300L
-        private const val ZOOM_EXIT_MS = 300L
         private const val ZOOM_OUT_SCALE = 0.85f
         private const val ZOOM_IN_SCALE = 1.15f
-        private const val FALLBACK_EXIT_MS = EXIT_DURATION_MS + 200L
+        private const val FALLBACK_EXTRA_MS = 200L
 
         // TEST BUILD switch: when true, the unlock has no slide animation at all.
         const val DISABLE_EXIT_ANIMATION = false
